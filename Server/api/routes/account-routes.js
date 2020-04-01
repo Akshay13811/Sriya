@@ -18,4 +18,7 @@ module.exports = function(app) {
 	app.route('/accounts/:accountId/transactions/:transactionId')
 		.delete(accounts.delete_transaction)
 		.post(accounts.update_transaction);
+
+	app.route('/accounts/graph/:graphPeriod/:graphInterval')
+		.get(accounts.graph_all_data)
 }

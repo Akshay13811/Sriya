@@ -3,7 +3,9 @@ var express = require('express'),
 	port = process.env.PORT || 3002,
 	mongoose = require('mongoose'),
 	Account = require('./api/models/account-model'),
-	bodyParser = require('body-parser');
+	bodyParser = require('body-parser'),
+	fileUpload = require('express-fileupload');
+
 
 var cors = require('cors');
 
@@ -12,6 +14,7 @@ mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/Accounts', { useNewUrlParser: true});
 
 app.use(cors())
+app.use(fileUpload());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

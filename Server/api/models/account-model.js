@@ -16,7 +16,9 @@ var AccountSchema = new Schema({
 	},
 	current_balance: {
 		type: Number,
-		required: 'Please enter the balance for this account'
+	},
+	import_file: {
+		type: String
 	},
 	transactions: [TransactionSchema]
 });
