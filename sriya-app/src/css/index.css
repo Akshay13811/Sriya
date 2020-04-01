@@ -1,0 +1,363 @@
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 300;
+  font-style: normal;
+  src: url("../../node_modules/npm-font-open-sans/fonts/Light/OpenSans-Light.eot");
+  src: url("../../node_modules/npm-font-open-sans/fonts/Light/OpenSans-Light.eot?#iefix") format("embedded-opentype"), url("../../node_modules/npm-font-open-sans/fonts/Light/OpenSans-Light.woff2") format("woff2"), url("../../node_modules/npm-font-open-sans/fonts/Light/OpenSans-Light.woff") format("woff"), url("../../node_modules/npm-font-open-sans/fonts/Light/OpenSans-Light.ttf") format("truetype"), url("../../node_modules/npm-font-open-sans/fonts/Light/OpenSans-Light.svg#OpenSansLight") format("svg"); }
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 300;
+  font-style: italic;
+  src: url("../../node_modules/npm-font-open-sans/fonts/LightItalic/OpenSans-LightItalic.eot");
+  src: url("../../node_modules/npm-font-open-sans/fonts/LightItalic/OpenSans-LightItalic.eot?#iefix") format("embedded-opentype"), url("../../node_modules/npm-font-open-sans/fonts/LightItalic/OpenSans-LightItalic.woff2") format("woff2"), url("../../node_modules/npm-font-open-sans/fonts/LightItalic/OpenSans-LightItalic.woff") format("woff"), url("../../node_modules/npm-font-open-sans/fonts/LightItalic/OpenSans-LightItalic.ttf") format("truetype"), url("../../node_modules/npm-font-open-sans/fonts/LightItalic/OpenSans-LightItalic.svg#OpenSansLightItalic") format("svg"); }
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: normal;
+  font-style: normal;
+  src: url("../../node_modules/npm-font-open-sans/fonts/Regular/OpenSans-Regular.eot");
+  src: url("../../node_modules/npm-font-open-sans/fonts/Regular/OpenSans-Regular.eot?#iefix") format("embedded-opentype"), url("../../node_modules/npm-font-open-sans/fonts/Regular/OpenSans-Regular.woff2") format("woff2"), url("../../node_modules/npm-font-open-sans/fonts/Regular/OpenSans-Regular.woff") format("woff"), url("../../node_modules/npm-font-open-sans/fonts/Regular/OpenSans-Regular.ttf") format("truetype"), url("../../node_modules/npm-font-open-sans/fonts/Regular/OpenSans-Regular.svg#OpenSansRegular") format("svg"); }
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: normal;
+  font-style: italic;
+  src: url("../../node_modules/npm-font-open-sans/fonts/Italic/OpenSans-Italic.eot");
+  src: url("../../node_modules/npm-font-open-sans/fonts/Italic/OpenSans-Italic.eot?#iefix") format("embedded-opentype"), url("../../node_modules/npm-font-open-sans/fonts/Italic/OpenSans-Italic.woff2") format("woff2"), url("../../node_modules/npm-font-open-sans/fonts/Italic/OpenSans-Italic.woff") format("woff"), url("../../node_modules/npm-font-open-sans/fonts/Italic/OpenSans-Italic.ttf") format("truetype"), url("../../node_modules/npm-font-open-sans/fonts/Italic/OpenSans-Italic.svg#OpenSansItalic") format("svg"); }
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 600;
+  font-style: normal;
+  src: url("../../node_modules/npm-font-open-sans/fonts/Semibold/OpenSans-Semibold.eot");
+  src: url("../../node_modules/npm-font-open-sans/fonts/Semibold/OpenSans-Semibold.eot?#iefix") format("embedded-opentype"), url("../../node_modules/npm-font-open-sans/fonts/Semibold/OpenSans-Semibold.woff2") format("woff2"), url("../../node_modules/npm-font-open-sans/fonts/Semibold/OpenSans-Semibold.woff") format("woff"), url("../../node_modules/npm-font-open-sans/fonts/Semibold/OpenSans-Semibold.ttf") format("truetype"), url("../../node_modules/npm-font-open-sans/fonts/Semibold/OpenSans-Semibold.svg#OpenSansSemibold") format("svg"); }
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 600;
+  font-style: italic;
+  src: url("../../node_modules/npm-font-open-sans/fonts/SemiboldItalic/OpenSans-SemiboldItalic.eot");
+  src: url("../../node_modules/npm-font-open-sans/fonts/SemiboldItalic/OpenSans-SemiboldItalic.eot?#iefix") format("embedded-opentype"), url("../../node_modules/npm-font-open-sans/fonts/SemiboldItalic/OpenSans-SemiboldItalic.woff2") format("woff2"), url("../../node_modules/npm-font-open-sans/fonts/SemiboldItalic/OpenSans-SemiboldItalic.woff") format("woff"), url("../../node_modules/npm-font-open-sans/fonts/SemiboldItalic/OpenSans-SemiboldItalic.ttf") format("truetype"), url("../../node_modules/npm-font-open-sans/fonts/SemiboldItalic/OpenSans-SemiboldItalic.svg#OpenSansSemiboldItalic") format("svg"); }
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: bold;
+  font-style: normal;
+  src: url("../../node_modules/npm-font-open-sans/fonts/Bold/OpenSans-Bold.eot");
+  src: url("../../node_modules/npm-font-open-sans/fonts/Bold/OpenSans-Bold.eot?#iefix") format("embedded-opentype"), url("../../node_modules/npm-font-open-sans/fonts/Bold/OpenSans-Bold.woff2") format("woff2"), url("../../node_modules/npm-font-open-sans/fonts/Bold/OpenSans-Bold.woff") format("woff"), url("../../node_modules/npm-font-open-sans/fonts/Bold/OpenSans-Bold.ttf") format("truetype"), url("../../node_modules/npm-font-open-sans/fonts/Bold/OpenSans-Bold.svg#OpenSansBold") format("svg"); }
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: bold;
+  font-style: italic;
+  src: url("../../node_modules/npm-font-open-sans/fonts/BoldItalic/OpenSans-BoldItalic.eot");
+  src: url("../../node_modules/npm-font-open-sans/fonts/BoldItalic/OpenSans-BoldItalic.eot?#iefix") format("embedded-opentype"), url("../../node_modules/npm-font-open-sans/fonts/BoldItalic/OpenSans-BoldItalic.woff2") format("woff2"), url("../../node_modules/npm-font-open-sans/fonts/BoldItalic/OpenSans-BoldItalic.woff") format("woff"), url("../../node_modules/npm-font-open-sans/fonts/BoldItalic/OpenSans-BoldItalic.ttf") format("truetype"), url("../../node_modules/npm-font-open-sans/fonts/BoldItalic/OpenSans-BoldItalic.svg#OpenSansBoldItalic") format("svg"); }
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 800;
+  font-style: normal;
+  src: url("../../node_modules/npm-font-open-sans/fonts/ExtraBold/OpenSans-ExtraBold.eot");
+  src: url("../../node_modules/npm-font-open-sans/fonts/ExtraBold/OpenSans-ExtraBold.eot?#iefix") format("embedded-opentype"), url("../../node_modules/npm-font-open-sans/fonts/ExtraBold/OpenSans-ExtraBold.woff2") format("woff2"), url("../../node_modules/npm-font-open-sans/fonts/ExtraBold/OpenSans-ExtraBold.woff") format("woff"), url("../../node_modules/npm-font-open-sans/fonts/ExtraBold/OpenSans-ExtraBold.ttf") format("truetype"), url("../../node_modules/npm-font-open-sans/fonts/ExtraBold/OpenSans-ExtraBold.svg#OpenSansExtrabold") format("svg"); }
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 800;
+  font-style: italic;
+  src: url("../../node_modules/npm-font-open-sans/fonts/ExtraBoldItalic/OpenSans-ExtraBoldItalic.eot");
+  src: url("../../node_modules/npm-font-open-sans/fonts/ExtraBoldItalic/OpenSans-ExtraBoldItalic.eot?#iefix") format("embedded-opentype"), url("../../node_modules/npm-font-open-sans/fonts/ExtraBoldItalic/OpenSans-ExtraBoldItalic.woff2") format("woff2"), url("../../node_modules/npm-font-open-sans/fonts/ExtraBoldItalic/OpenSans-ExtraBoldItalic.woff") format("woff"), url("../../node_modules/npm-font-open-sans/fonts/ExtraBoldItalic/OpenSans-ExtraBoldItalic.ttf") format("truetype"), url("../../node_modules/npm-font-open-sans/fonts/ExtraBoldItalic/OpenSans-ExtraBoldItalic.svg#OpenSansExtraboldItalic") format("svg"); }
+
+:root {
+  --menu-icon-colour: rgba(255,255,255,0.5);
+  --bank-icon-colour: rgba(255,255,255,0.5);
+  --shares-icon-colour: rgba(255,255,255,0.5);
+  --home-icon-colour: rgba(255,255,255,0.5); }
+
+body {
+  background-color: #2A303C !important;
+  font-family: 'Open Sans';
+  margin: 0px; }
+
+.hidden {
+  visibility: hidden; }
+
+.fadeOut {
+  opacity: 0;
+  z-index: -1;
+  height: 0px;
+  transition: opacity 0.3s, z-index 0s 0.3s, display 0s 0.3s; }
+
+.fadeIn {
+  opacity: 1;
+  transition: opacity 0.3s 0.3s, display 0.3s 0.3s;
+  z-index: 1; }
+
+.dashboard-menu-dialogs {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.8); }
+
+.dashboard-menu-dialog {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 500px;
+  height: 280px;
+  left: 50%;
+  top: calc((100% - 280px)/2);
+  margin-left: -250px;
+  /* Negative half of width. */
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+  background-color: #2A303C;
+  border-radius: 5px; }
+
+.dashboard-bank-dialog {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 40px 200px 40px;
+  grid-template-columns: repeat(3, 33.33%); }
+
+.dashboard-dialog-header {
+  grid-column: 1/4;
+  line-height: 40px;
+  color: rgba(255, 255, 255, 0.8); }
+
+.dashboard-dialog-container {
+  grid-column: 1/4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.5); }
+
+.dashboard-dialog-green-button,
+.dashboard-dialog-red-button,
+.dashboard-dialog-neutral-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer; }
+
+.dashboard-dialog-green-button {
+  grid-column: 3;
+  background-color: #81C784; }
+
+.dashboard-dialog-red-button {
+  grid-column: 1;
+  background-color: #ef5350; }
+
+.dashboard-dialog-neutral-button {
+  background-color: #90CAF9; }
+
+.green-button-disabled {
+  background-color: #416442 !important; }
+
+.dashboard-dialog-green-button:hover {
+  background-color: #A5D6A7; }
+
+.dashboard-bank-card {
+  background-color: #353a46;
+  border: 1px solid #3f4550;
+  padding: 10px;
+  border-radius: 5px;
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: 100%;
+  grid-template-columns: repeat(3, 1fr); }
+
+.dashboard-bank-card-name {
+  grid-column: 1; }
+
+.dashboard-bank-card-amount {
+  display: flex;
+  grid-column: 3;
+  justify-content: flex-end; }
+
+.dashboard-bank-form {
+  position: relative;
+  height: 100%; }
+
+.dashboard-bank-summary {
+  position: absolute;
+  transition: 0.3s;
+  top: 0px;
+  height: 100%;
+  width: 100%; }
+
+.dashboard-bank-form-bank-list {
+  width: 50%;
+  height: 100%;
+  margin: auto;
+  display: grid;
+  grid-template-rows: 100%;
+  grid-template-columns: repeat(3, 33.33%); }
+
+.dashboard-bank-form-bank-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px; }
+
+.dashboard-bank-form-bank-option > img {
+  border-radius: 5px;
+  width: 100%;
+  opacity: 0.5;
+  transition: .3s ease; }
+
+.dashboard-bank-form-bank-option > img:hover {
+  opacity: 1;
+  transition: .3s ease;
+  cursor: pointer; }
+
+.dashboard-bank-form-input {
+  position: absolute;
+  top: 0px;
+  width: 50%;
+  height: 100%;
+  left: 25%;
+  display: grid;
+  grid-template-rows: repeat(10, 10%);
+  grid-row-gap: 10px; }
+
+.dashboard-bank-list {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  height: 100%; }
+
+.dashboard-menu-bar {
+  position: fixed;
+  height: 100%;
+  padding-top: 10px;
+  display: grid;
+  grid-template-rows: repeat(3, 50px);
+  grid-row-gap: 10px;
+  grid-template-columns: repeat(1, 100%);
+  width: 50px;
+  background-color: #262b36; }
+
+.dashboard-menu-button {
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  height: 50px;
+  cursor: pointer; }
+
+.dashboard-menu-button:hover {
+  background-color: #74B8FF; }
+
+.menu-icon:hover {
+  --menu-icon-colour: rgba(0,0,0,0.5); }
+
+.bank-icon:hover {
+  --bank-icon-colour: rgba(0,0,0,0.5); }
+
+.shares-icon:hover {
+  --shares-icon-colour: rgba(0,0,0,0.5); }
+
+.home-icon:hover {
+  --home-icon-colour: rgba(0,0,0,0.5); }
+
+.icon > svg > path {
+  /*target the image with css*/
+  fill: var(--primary-color); }
+
+.dashboard-main-container {
+  display: grid;
+  grid-template-rows: repeat(9, 33.33%);
+  grid-template-columns: repeat(3, 33.33%);
+  position: relative;
+  height: 100vh;
+  left: 50px;
+  width: calc(100% - 50px);
+  padding: 5px;
+  box-sizing: border-box; }
+
+@media (max-width: 500px) {
+  /* CSS that should be displayed if width is equal to or less than 800px goes here */
+  .dashboard-main-container {
+    grid-template-columns: 100%; } }
+
+.dashboard-card {
+  background-color: #353a46;
+  padding: 10px 20px 10px 20px;
+  margin: 5px;
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  flex-flow: column;
+  align-items: stretch;
+  display: grid;
+  grid-template-rows: 25px auto;
+  grid-template-columns: 33.33% 66.66%; }
+
+.dashboard-chart {
+  padding-top: 10px;
+  overflow: hidden;
+  flex: 1 1 auto;
+  grid-column-start: 1;
+  grid-column-end: 3; }
+
+.dashboard-chart.canvas {
+  height: 100%; }
+
+.dashboard-card-header {
+  color: white;
+  font-weight: 600;
+  font-size: 18px;
+  height: 25px;
+  flex: 0 1 auto; }
+
+.dashboard-chart-options {
+  display: grid;
+  grid-template-rows: 100%;
+  grid-template-columns: 30% 30% 30% 10%;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  color: white;
+  font-size: 9pt; }
+
+.dashboard-chart-option {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; }
+
+.dashboard-chart-option:hover {
+  background-color: rgba(116, 184, 255, 0.5);
+  cursor: pointer; }
+
+.dashboard-chart-dropdown-option:hover {
+  background-color: rgba(116, 184, 255, 0.5);
+  cursor: pointer; }
+
+.dashboard-chart-dropdown {
+  position: absolute;
+  width: 75px;
+  top: 25px;
+  right: 0px;
+  display: grid;
+  grid-template-rows: 25px;
+  grid-template-columns: 100%;
+  background-color: #494e58;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px; }
+
+.dashboard-chart-dropdown-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 25px; }
+
+.select {
+  background-color: rgba(116, 184, 255, 0.5); }
