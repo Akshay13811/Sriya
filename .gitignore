@@ -2,7 +2,7 @@
 
 # dependencies
 /Server/node_modules
-/sriya-app/node_modules
+/sriya-app-tsx/node_modules
 /.pnp
 .pnp.js
 

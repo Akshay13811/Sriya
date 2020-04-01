@@ -1,0 +1,371 @@
+$FontPathOpenSans: "../../../node_modules/npm-font-open-sans/fonts";
+@import '../../../node_modules/npm-font-open-sans/open-sans.scss';
+
+//Variables
+$dashboard-colour: #2A303C;
+$dashboard-bar-width: 50px;
+$dashboard-dialog-height: 280px;
+$dashboard-dialog-width: 500px;
+$dashboard-dialog-header-height: 40px;
+$dashboard-dialog-footer-height: 40px;
+$dashboard-button-green-color: #81C784;
+$dashboard-button-red-color: #ef5350;
+$dashboard-button-color: #90CAF9;
+$dashboard-card-header-height: 25px;
+
+//CSS variables
+:root {
+	--menu-icon-colour: rgba(255,255,255,0.5);
+	--bank-icon-colour: rgba(255,255,255,0.5);
+	--shares-icon-colour: rgba(255,255,255,0.5);
+	--home-icon-colour: rgba(255,255,255,0.5);
+}
+
+body {
+	background-color: $dashboard-colour !important;
+	font-family: 'Open Sans';
+	margin: 0px;
+}	
+
+.hidden {
+	visibility: hidden;
+}
+
+.fadeOut{
+	opacity:0;
+	z-index: -1;
+	height: 0px;
+	transition: opacity 0.3s, z-index 0s 0.3s, display 0s 0.3s;
+}
+
+.fadeIn{
+	opacity:1;
+	transition: opacity 0.3s 0.3s, display 0.3s 0.3s;
+	z-index: 1;
+}
+
+.dashboard-menu-dialogs {
+	position: fixed;
+	height: 100%;
+	width: 100%;
+	background-color: rgba(0,0,0,0.8);
+}
+
+.dashboard-menu-dialog {
+	position: fixed;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 500px;
+	height: $dashboard-dialog-height;
+	left: 50%;
+	top: calc((100% - #{$dashboard-dialog-height})/2);
+	margin-left: -$dashboard-dialog-width/2; /* Negative half of width. */
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-bottom: 10px;
+	background-color: $dashboard-colour;
+	border-radius: 5px;
+}
+
+.dashboard-bank-dialog {
+	width: 100%;
+	height: 100%;
+	display: grid;
+	grid-template-rows: $dashboard-dialog-header-height 200px $dashboard-dialog-footer-height;
+	grid-template-columns: repeat(3, 33.33%);
+}
+
+.dashboard-dialog-header {
+	grid-column: 1/4;
+	line-height: $dashboard-dialog-header-height;
+	color: rgba(255,255,255,0.8);
+}
+
+.dashboard-dialog-container {
+	grid-column: 1/4;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: rgba(255,255,255,0.5);
+}
+
+.dashboard-dialog-green-button,
+.dashboard-dialog-red-button,
+.dashboard-dialog-neutral-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 5px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.dashboard-dialog-green-button {
+	grid-column: 3;
+	background-color: $dashboard-button-green-color;
+}
+
+.dashboard-dialog-red-button {
+	grid-column: 1;
+	background-color: $dashboard-button-red-color;
+}
+
+.dashboard-dialog-neutral-button {
+	background-color: $dashboard-button-color;
+}
+
+.green-button-disabled {
+	background-color: mix(black, $dashboard-button-green-color, 50) !important;
+}
+
+.dashboard-dialog-green-button:hover {
+	background-color: #A5D6A7;
+}
+
+.dashboard-bank-card {
+	background-color: mix(white, $dashboard-colour, 5);
+	border: 1px solid mix(white, $dashboard-colour, 10);
+	padding: 10px;
+	border-radius: 5px;
+	width: 100%;
+	box-sizing: border-box;
+
+	display: grid;
+	grid-template-rows: 100%;
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.dashboard-bank-card-name {
+	grid-column: 1;
+}
+
+.dashboard-bank-card-amount {
+	display: flex;
+	grid-column: 3;
+	justify-content: flex-end;
+}
+
+.dashboard-bank-form {
+	position: relative;
+	height: 100%;
+}
+
+.dashboard-bank-summary {
+	position: absolute;
+	transition: 0.3s;
+	top: 0px;
+	height: 100%;
+	width: 100%;
+}
+
+.dashboard-bank-form-bank-list {
+	width: 50%;
+	height: 100%;
+	margin: auto;
+	display: grid;
+	grid-template-rows: 100%;
+	grid-template-columns: repeat(3,33.33%);
+}
+
+.dashboard-bank-form-bank-option {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+}
+
+.dashboard-bank-form-bank-option>img {
+	border-radius: 5px;
+	width: 100%;
+	opacity: 0.5;
+	transition: .3s ease;
+}
+
+.dashboard-bank-form-bank-option>img:hover {
+	opacity: 1;
+	transition: .3s ease;
+	cursor: pointer;
+}
+
+.dashboard-bank-form-input {
+	position: absolute;
+	top: 0px;
+	width: 50%;
+	height: 100%;
+	left: 25%;
+
+	display: grid;
+	grid-template-rows: repeat(10, 10%);
+	grid-row-gap: 10px;
+}
+
+.dashboard-bank-list {
+	position: absolute;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+}
+
+.dashboard-menu-bar {
+	position: fixed;
+	height: 100%;
+	padding-top: 10px;
+
+	display: grid;
+	grid-template-rows: repeat(3, $dashboard-bar-width);
+	grid-row-gap: 10px;
+	grid-template-columns: repeat(1, 100%);
+
+	width: $dashboard-bar-width;
+	background-color: mix(black, $dashboard-colour, 10);
+}
+
+.dashboard-menu-button {
+	height: 100%;
+	padding: 10px;
+	box-sizing: border-box;
+	height: $dashboard-bar-width;
+	cursor: pointer;
+}
+
+.dashboard-menu-button:hover {
+	background-color: #74B8FF;
+}
+
+.menu-icon:hover {
+	--menu-icon-colour: rgba(0,0,0,0.5);
+}
+
+.bank-icon:hover {
+	--bank-icon-colour: rgba(0,0,0,0.5);
+}
+
+.shares-icon:hover {
+	--shares-icon-colour: rgba(0,0,0,0.5);
+}
+
+.home-icon:hover {
+	--home-icon-colour: rgba(0,0,0,0.5);
+}
+
+.icon>svg>path{ /*target the image with css*/
+	fill: var(--primary-color);
+  }
+
+.dashboard-main-container {
+	display: grid;
+	grid-template-rows: repeat(9, 33.33%);
+	grid-template-columns: repeat(3, 33.33%);
+
+	position: relative;
+	height: 100vh;
+	left: $dashboard-bar-width;
+	width: calc(100% - #{$dashboard-bar-width});
+	padding: 5px;
+	box-sizing: border-box;
+}
+
+@media (max-width: 500px) {
+	/* CSS that should be displayed if width is equal to or less than 800px goes here */
+	.dashboard-main-container {
+		grid-template-columns: 100%;
+	}
+}
+
+.dashboard-card {
+	background-color: mix(white, $dashboard-colour, 5);
+	padding: 10px 20px 10px 20px;
+	margin: 5px;
+	box-sizing: border-box;
+
+	flex: 1 1 auto;
+	flex-flow: column;
+	align-items: stretch;	
+
+	display: grid;
+	grid-template-rows: $dashboard-card-header-height auto;
+	grid-template-columns: 33.33% 66.66%;
+}	
+
+.dashboard-chart {
+	padding-top:10px;
+	overflow: hidden;
+	flex: 1 1 auto;
+
+	grid-column-start: 1;
+	grid-column-end: 3;
+}
+
+.dashboard-chart.canvas {
+	height: 100%;
+}
+
+.dashboard-card-header {
+	color: white;
+	font-weight: 600;
+	font-size: 18px;
+	height: $dashboard-card-header-height;
+
+	flex: 0 1 auto;
+}
+
+.dashboard-chart-options {
+	display: grid;
+	grid-template-rows: 100%;
+	grid-template-columns: 30% 30% 30% 10%;
+
+	background-color: rgba(255,255,255,0.1);
+	border: 1px solid rgba(255,255,255,0.1);
+	border-radius: 3px;
+
+	color: white;
+	font-size: 9pt;
+}
+
+.dashboard-chart-option {
+	width: 100%;
+	height: 100%;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	position: relative;
+}
+
+.dashboard-chart-option:hover {
+	background-color: rgba(116, 184, 255, 0.5);
+	cursor: pointer;
+}
+
+.dashboard-chart-dropdown-option:hover {
+	background-color: rgba(116, 184, 255, 0.5);
+	cursor: pointer;
+}
+
+.dashboard-chart-dropdown {
+	position: absolute;
+	width: 75px;
+	top:$dashboard-card-header-height;
+	right:0px;
+
+	display: grid;
+	grid-template-rows: $dashboard-card-header-height;
+	grid-template-columns: 100%;
+
+	background-color: mix(white, $dashboard-colour, 14.5);
+	border: 1px solid rgba(255,255,255,0.2);
+	border-radius: 3px;
+}
+
+.dashboard-chart-dropdown-option {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: $dashboard-card-header-height;
+}
+
+.select {
+	background-color: rgba(116, 184, 255, 0.5);
+}
