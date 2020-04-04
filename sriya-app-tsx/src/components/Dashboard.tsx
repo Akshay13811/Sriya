@@ -11,6 +11,7 @@ import { IAccount } from '../interfaces/IAccount';
 interface IProps {}
 interface IState {
 	accounts: Array<IAccount>;
+	refreshAccountCard: () => void;
 }
 
 export class Dashboard extends React.Component<IProps, IState> {
@@ -19,6 +20,7 @@ export class Dashboard extends React.Component<IProps, IState> {
 		super(props);
 		this.state = {
 			accounts: [],
+			refreshAccountCard: () => {}
 		}
 	}
 
@@ -35,11 +37,14 @@ export class Dashboard extends React.Component<IProps, IState> {
 			})
 		})
 		.catch(console.log)
+
+		this.state.refreshAccountCard();
 	}
 
 	renderAccountCard() {
 		return (
 			<AccountCard
+				refreshCard={(callable: () => void) => this.setState({refreshAccountCard: callable})}
 			/>
 		)
 	}
@@ -48,6 +53,7 @@ export class Dashboard extends React.Component<IProps, IState> {
 		return (
 			<DashboardBar
 				accounts={this.state.accounts}
+				refreshAccountData={() => this.fetchAccountData()}
 			/>
 		)
 	}

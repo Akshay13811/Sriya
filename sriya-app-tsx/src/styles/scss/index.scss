@@ -28,19 +28,19 @@ body {
 }	
 
 .hidden {
-	visibility: hidden;
+	display: none !important;
 }
 
 .fadeOut{
 	opacity:0;
 	z-index: -1;
-	height: 0px;
-	transition: opacity 0.3s, z-index 0s 0.3s, display 0s 0.3s;
+	height: 0px !important;
+	transition: opacity 0.3s, z-index 0s 0.3s, display 0s 0.3s, height 0s 0.3s;
 }
 
 .fadeIn{
 	opacity:1;
-	transition: opacity 0.3s 0.3s, display 0.3s 0.3s;
+	transition: opacity 0.3s 0.3s, display 0.3s 0.3s, height 0.3s 0.3s;
 	z-index: 1;
 }
 
@@ -102,17 +102,26 @@ body {
 }
 
 .dashboard-dialog-green-button {
-	grid-column: 3;
+	color: $dashboard-colour;
 	background-color: $dashboard-button-green-color;
 }
 
 .dashboard-dialog-red-button {
-	grid-column: 1;
+	color: $dashboard-colour;
 	background-color: $dashboard-button-red-color;
 }
 
 .dashboard-dialog-neutral-button {
+	color: $dashboard-colour;
 	background-color: $dashboard-button-color;
+}
+
+.bank-dialog-left-button {
+	grid-column: 1;
+}
+
+.bank-dialog-right-button {
+	grid-column: 3;
 }
 
 .green-button-disabled {
@@ -127,12 +136,13 @@ body {
 	background-color: mix(white, $dashboard-colour, 5);
 	border: 1px solid mix(white, $dashboard-colour, 10);
 	padding: 10px;
+	margin-bottom: 5px;
 	border-radius: 5px;
 	width: 100%;
 	box-sizing: border-box;
 
 	display: grid;
-	grid-template-rows: 100%;
+	grid-template-rows: 25px;
 	grid-template-columns: repeat(3, 1fr);
 }
 
@@ -146,13 +156,40 @@ body {
 	justify-content: flex-end;
 }
 
+.dashboard-bank-card-expand {
+	display: grid;
+	grid-column-start: 1;
+	grid-column-end: 4;
+	height: 100%;
+	box-sizing: border-box;
+	grid-template-rows: 100%;
+	grid-template-columns: repeat(3, 1fr);	
+}
+
+.dashboard-bank-card-update {
+	display: grid;
+	grid-column-start: 1;
+	grid-column-end: 4;
+	height: 100%;
+	box-sizing: border-box;
+	grid-template-rows: repeat(2, 1fr);
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.dashboard-bank-card-label {
+	grid-column: 1;
+}
+
+.dashboard-bank-card-update-input {
+	grid-column: 2/4;
+}
+
 .dashboard-bank-form {
 	position: relative;
 	height: 100%;
 }
 
 .dashboard-bank-summary {
-	position: absolute;
 	transition: 0.3s;
 	top: 0px;
 	height: 100%;
@@ -189,7 +226,6 @@ body {
 }
 
 .dashboard-bank-form-input {
-	position: absolute;
 	top: 0px;
 	width: 50%;
 	height: 100%;

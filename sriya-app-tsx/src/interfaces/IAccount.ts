@@ -1,7 +1,8 @@
 export interface IAccount {
 	_id: string;
-	name: string;
-	current_balance: number;
+	accountName: string;
+	bankName: string;
+	currentBalance: number;
 	transactions: Array<ITransaction>;
 } 
 

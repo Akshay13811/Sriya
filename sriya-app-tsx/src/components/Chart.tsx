@@ -6,48 +6,54 @@ import {IGraphData} from '../interfaces/IGraphData';
 //3rd party chart library
 import {Line} from 'react-chartjs-2';
 
-export const ChartPeriods = {
-	WEEK: {
-		//1 Week
+export const ChartConfigurations = [
+	{
+		option: '1 Week',
 		period: 7,
-		interval: 1
+		interval: 1,
+		numOfLabels: 8
 	},
-	ONEMONTH: {
-		//1 Month
+	{
+		option: '1 Month',
 		period: 28,
-		interval: 7
+		interval: 2,
+		numOfLabels: 4
 	},
-	THREEMONTHS: {
-		//3 Months
+	{
+		option: '3 Months',
 		period: 90,
-		interval: 15
+		interval: 5,
+		numOfLabels: 6
 	},
-	SIXMONTHS: {
-		//6 Months
+	{
+		option: '6 Months',
 		period: 180,
-		interval: 60
+		interval: 5,
+		numOfLabels: 6
 	},
-	ONEYEAR: {
-		//1 Year
+	{
+		option: '1 Year',
 		period: 365,
-		interval: 90
+		interval: 5,
+		numOfLabels: 6
 	},
-	THREEYEARS: {
-		//3 Years
+	{
+		option: '3 Years',
 		period: 365*3,
-		interval: 365*0.5
+		interval: 15,
+		numOfLabels: 6
 	},
-	FIVEYEARS: {
-		//5 Years
+	{
+		option: '5 Years',
 		period: 365*5,
-		interval: 365
+		interval: 25,
+		numOfLabels: 5
 	}
-}
+]
 
 interface IProps {
 	data: IGraphData;
-	period: number;
-	interval: number;
+	configuration: number;
 	color: string;
 }
 
@@ -71,8 +77,13 @@ export class Chart extends React.Component<IProps> {
 		var range = max - min;
 		var magnitude = Math.pow(10, Math.floor(range).toString().length - 1);
 		var roundedRange = (Math.round(range / magnitude) * magnitude);
-	
-		return roundedRange/numOfSteps;
+
+		if(roundedRange == 0) {
+			return 1;
+		}
+		else {
+			return roundedRange/numOfSteps;
+		}
 	}
 
 	getLabels() {
@@ -80,50 +91,45 @@ export class Chart extends React.Component<IProps> {
 		var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 		var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-		if(this.props.period == ChartPeriods.WEEK.period) {
-			var keys = Object.keys(this.props.data);
+		var keys = Object.keys(this.props.data);
+
+		if(this.props.configuration == 0) { // 1 Week
 			for(var key in keys) {
 				var date = new Date(key);
 				labels.push(days[date.getDay()]);
 			}
 		}
-		else if(this.props.period == ChartPeriods.ONEMONTH.period) {
-			var keys = Object.keys(this.props.data);
+		else if(this.props.configuration == 1) {
 			for(var i=0; i<keys.length; i++) {
 				var date = new Date(parseInt(keys[i]));
 				labels.push(date.getDate() + '-' + months[date.getMonth()])
 			}
 		}
-		else if(this.props.period == ChartPeriods.THREEMONTHS.period) {
-			var keys = Object.keys(this.props.data);
+		else if(this.props.configuration == 2) {
 			for(var i=0; i<keys.length; i++) {
 				var date = new Date(parseInt(keys[i]));
 				labels.push(date.getDate() + '-' + months[date.getMonth()])
 			}
 		}
-		else if(this.props.period == ChartPeriods.SIXMONTHS.period) {
-			var keys = Object.keys(this.props.data);
+		else if(this.props.configuration == 3) {
 			for(var i=0; i<keys.length; i++) {
 				var date = new Date(parseInt(keys[i]));
 				labels.push(months[date.getMonth()] + '-' + date.getFullYear())
 			}
 		}
-		else if(this.props.period == ChartPeriods.ONEYEAR.period) {
-			var keys = Object.keys(this.props.data);
+		else if(this.props.configuration == 4) {
 			for(var i=0; i<keys.length; i++) {
 				var date = new Date(parseInt(keys[i]));
 				labels.push(months[date.getMonth()] + '-' + date.getFullYear())
 			}
 		}
-		else if(this.props.period == ChartPeriods.THREEYEARS.period) {
-			var keys = Object.keys(this.props.data);
+		else if(this.props.configuration == 5) {
 			for(var i=0; i<keys.length; i++) {
 				var date = new Date(parseInt(keys[i]));
 				labels.push(months[date.getMonth()] + '-' + date.getFullYear())
 			}
 		}
-		else if(this.props.period == ChartPeriods.FIVEYEARS.period) {
-			var keys = Object.keys(this.props.data);
+		else if(this.props.configuration == 6) {
 			for(var i=0; i<keys.length; i++) {
 				var date = new Date(parseInt(keys[i]));
 				labels.push(date.getFullYear())
@@ -136,6 +142,8 @@ export class Chart extends React.Component<IProps> {
 	render() {
 		var stepSize = this.getStepSize(4);
 		var labels = this.getLabels();
+		console.log(labels);
+		console.log(this.props.data)
 
 		var data = {
 			labels: labels.reverse(),
@@ -163,7 +171,8 @@ export class Chart extends React.Component<IProps> {
 									drawTicks: true,	
 								},
 								ticks: {
-									fontColor: 'rgba(255,255,255,1)'
+									fontColor: 'rgba(255,255,255,1)',
+									maxTicksLimit: ChartConfigurations[this.props.configuration].numOfLabels
 								}
 							}],
 							yAxes: [{
