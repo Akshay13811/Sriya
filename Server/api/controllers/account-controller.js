@@ -51,11 +51,9 @@ function importINGBankFile(importFile) {
 		}
 	}
 
-	console.log(currentBalance);
-
 	return {
 		"transactions" : transactions,
-		"current_balance" : currentBalance
+		"currentBalance" : Math.round(currentBalance)
 	}
 }
 
@@ -67,20 +65,19 @@ exports.create_account = function(req, res) {
 	var currentBalance = 0;
 	var transactions = [];
 	if(req.files && Object.keys(req.files).length > 0) {
-		if(req.body.name == "ING") {
+		if(req.body.bankName == "ING") {
 			var info = importINGBankFile(req.files.importFile);
-			console.log(info);
 			transactions = info.transactions;
-			currentBalance = info.current_balance;
+			currentBalance = info.currentBalance;
 		}
 	}
-	else if(req.body.current_balance) {
-		currentBalance = req.body.current_balance;
+	else if(req.body.currentBalance) {
+		currentBalance = req.body.currentBalance;
 	}
 
 	var new_account = new Account(req.body);
 	new_account.transactions = transactions;
-	new_account.current_balance = currentBalance;
+	new_account.currentBalance = currentBalance;
 	new_account.save(function(err, account) {
 		if(err)
 			res.send(err);
@@ -95,15 +92,71 @@ exports.delete_account = function(req, res) {
 	}, function(err, account) {
 		if (err)
 			res.send(err)
-		res.json({ message: 'Account successfully deleted' });
+		res.json({ message: 'Account successfully deleted' , success: true});
 	})
 }
 
 exports.update_account = function(req, res) {
-	Account.findOneAndUpdate({_id: req.params.accountId}, req.body, {new: true}, function(err, account) {
-	  if (err)
-		res.send(err);
-	  res.json(account);
+	Account.findOne({
+		_id: req.params.accountId
+	}, function(err, account) {
+		var currentBalance = 0;
+		var transactions = [];
+		if(req.files && Object.keys(req.files).length > 0) {
+			if(account.bankName == "ING") {
+				var info = importINGBankFile(req.files.importFile);
+				transactions = info.transactions;
+				currentBalance = info.currentBalance;
+			}
+		}
+
+		account.transactions = transactions;
+		account.currentBalance = currentBalance;
+		account.save();
+
+		/*
+		//Update account with new transactions
+		if(account.transactions.length == 0) {
+			//import all transactions into the account
+			account.transactions = transactions;
+			account.currentBalance = currentBalance;
+		}
+		else {
+			//Last transaction known by server for this account
+			let date = new Date(account.transactions[0].date)
+			let amount = account.transactions[0].amount;
+			let description = account.transactions[0].description;
+
+			//Find the last common transaction between the lists
+			var matchingTransactionIndex = 0;
+			for(var i=0; i<transactions.length; i++)
+			{
+				if(transactions[i].date == date.getTime() && transactions[i].amount == amount && transactions[i].description == description) {
+					console.log("Found last common transaction: " + i);
+					matchingTransactionIndex = i;
+					break;
+				}
+			}
+
+			if(matchingTransactionIndex != 0) {
+				//Prepend all transactions up to the last common transaction
+				var newTransactions = transactions.splice(0, matchingTransactionIndex);
+
+				for(var i=0; i<newTransactions.length; i++) {
+					currentBalance += newTransactions[i].amount
+				}
+
+				var updatedTransactions = newTransactions.concat(account.transactions);
+				account.transactions = updatedTransactions;
+			}
+			account.save();
+			
+		}
+		*/
+		
+		if (err)
+			res.send(err);
+		res.json(account);
 	});
   };
 
@@ -192,7 +245,7 @@ exports.graph_all_data = function(req, res) {
 }
 
 function calculateGraphData(account, timePeriod, timeInterval) {
-
+	
 	var interval = DAYINMS*timeInterval;
 	//Get current data
 	var currentDate = new Date();
@@ -200,16 +253,14 @@ function calculateGraphData(account, timePeriod, timeInterval) {
 
 	var endDate = currentDate.getTime() - DAYINMS*timePeriod;
 
-	var currentBalance = account.current_balance;
+	var currentBalance = account.currentBalance;
 	var data = {}
 
 	//Set current balance for current date
 	data[currentDate.getTime()] = currentBalance;
 
 	//Change current date to the next date
-	var nextDate = currentDate.getTime() - interval;
-	currentDate = new Date(nextDate);
-	nextDate = new Date(nextDate - interval);
+	currentDate = new Date(currentDate - interval);
 	data[currentDate.getTime()] = currentBalance;
 	                                                                                                                                    
 	for(var i=0; i<account.transactions.length; i++) {
@@ -217,6 +268,12 @@ function calculateGraphData(account, timePeriod, timeInterval) {
 		var transactionDate = new Date(transaction.date);
 
 		if(transactionDate <= endDate) {
+			//Fill out all remaining intervals with current balance
+			currentDate = new Date(currentDate - interval);
+			while(currentDate >= endDate) {
+				data[currentDate.getTime()] = currentBalance;
+				currentDate = new Date(currentDate - interval);
+			}
 			break;
 		}
 

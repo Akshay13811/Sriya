@@ -9,16 +9,17 @@ var TransactionSchema = new Schema({
 });
 
 var AccountSchema = new Schema({
-	name: {
+	bankName: {
+		type: String,
+		required: 'Please enter the name of the Bank'
+	},
+	accountName: {
 		type: String,
 		unique: true,
 		required: 'Please enter the name of the Account'
 	},
-	current_balance: {
+	currentBalance: {
 		type: Number,
-	},
-	import_file: {
-		type: String
 	},
 	transactions: [TransactionSchema]
 });
