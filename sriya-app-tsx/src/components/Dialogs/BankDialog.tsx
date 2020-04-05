@@ -12,7 +12,8 @@ export enum BankName {
 	UNKNOWN = "",
 	ING = "ING",
 	UBANK = "UBANK",
-	COMMBANK = "COMMBANK"
+	COMMBANK = "COMMBANK",
+	RAMS = "RAMS"
 }
 
 interface IProps {

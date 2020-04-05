@@ -77,12 +77,19 @@ export class Chart extends React.Component<IProps> {
 		var range = max - min;
 		var magnitude = Math.pow(10, Math.floor(range).toString().length - 1);
 		var roundedRange = (Math.round(range / magnitude) * magnitude);
+		var minorRange = range - roundedRange
+
+		var minorRoundedRange = 0;
+		if(minorRange > 0) {
+			magnitude = Math.pow(10, Math.floor(minorRange).toString().length - 1);
+			minorRoundedRange = (Math.round(minorRange / magnitude) * magnitude);
+		}
 
 		if(roundedRange == 0) {
 			return 1;
 		}
 		else {
-			return roundedRange/numOfSteps;
+			return (roundedRange + minorRoundedRange)/numOfSteps;
 		}
 	}
 

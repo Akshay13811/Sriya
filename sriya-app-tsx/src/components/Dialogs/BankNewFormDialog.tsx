@@ -15,6 +15,7 @@ interface IProps {
 
 interface IState {
 	accountName: string; 
+	accountBalance: number;
 	accountFile: any;
 	displayMsg: string;
 }
@@ -25,6 +26,7 @@ export class BankNewFormDialog extends React.Component<IProps, IState> {
 		super(props);
 		this.state = {
 			accountName: "",
+			accountBalance: -1,
 			accountFile: null,
 			displayMsg: ""
 		}
@@ -44,6 +46,10 @@ export class BankNewFormDialog extends React.Component<IProps, IState> {
 		formData.append("importFile", this.state.accountFile);
 		formData.append("bankName", this.props.bankOption);
 		formData.append("accountName", this.state.accountName);
+
+		if(this.state.accountBalance != -1) {
+			formData.append("accountBalance", this.state.accountBalance.toString());
+		}
 
 		fetch(EndpointUrl + '/accounts', {
 			method: 'POST',
@@ -68,6 +74,30 @@ export class BankNewFormDialog extends React.Component<IProps, IState> {
 		});
 	}
 
+	accountBalanceHandler(e: React.ChangeEvent<HTMLInputElement>) {
+		if(e.currentTarget.value == "") {
+			this.setState({
+				accountBalance: -1
+			});
+		}
+		else
+		{
+			var balance = parseFloat(e.currentTarget.value);
+
+			if(isNaN(balance)) {
+				this.setState({
+					displayMsg: "Invalid account balance"
+				});
+			}
+			else {
+				this.setState({
+					displayMsg: "",
+					accountBalance: balance
+				});
+			}
+		}
+	}
+
 	accountFileHandler(e: React.ChangeEvent<HTMLInputElement>) {
 		if(e.currentTarget.files && e.currentTarget.files.length > 0) {
 			this.setState({
@@ -87,6 +117,8 @@ export class BankNewFormDialog extends React.Component<IProps, IState> {
 						<div className='dashboard-bank-form-input'>
 							<label>Account Name</label>
 							<input type="text" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.accountNameHandler(e)}/>
+							<label>Account Balance</label>
+							<input type="text" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.accountBalanceHandler(e)}/>
 							<label>Import Bank File</label>
 							<input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.accountFileHandler(e)}/>
 							<div>{this.state.displayMsg}</div>

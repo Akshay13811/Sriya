@@ -4,6 +4,7 @@ import React from 'react';
 import ingIcon from '../../images/ing.jpg';
 import ubankIcon from '../../images/ubank.jpg';
 import commbankIcon from '../../images/commbank.png';
+import ramsIcon from '../../images/rams.jpg';
 
 //Enums
 import {BankName} from './BankDialog';
@@ -37,6 +38,9 @@ export class BankNewSelectionDialog extends React.Component<IProps> {
 							</div>
 							<div className="dashboard-bank-form-bank-option" onClick={() => this.props.nextDialog(BankName.COMMBANK)}>
 								<img src={commbankIcon}></img>
+							</div>
+							<div className="dashboard-bank-form-bank-option" onClick={() => this.props.nextDialog(BankName.RAMS)}>
+								<img src={ramsIcon}></img>
 							</div>
 						</div>
 					</div>

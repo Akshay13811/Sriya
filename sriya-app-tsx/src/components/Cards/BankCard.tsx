@@ -113,7 +113,7 @@ export class BankCard extends React.Component<IProps, IState> {
 					{this.props.account.accountName}
 				</div>
 				<div className="dashboard-bank-card-amount">
-					${this.numberWithCommas(this.props.account.currentBalance)}
+					${this.numberWithCommas(this.props.account.currentBalance / 100)}
 				</div>
 				<div className={this.state.expanded && !this.state.showUpdate ? 'dashboard-bank-card-expand fadeIn' : 'dashboard-bank-card-expand fadeOut'} onClick={() => this.showUpdate()}>
 					<div className='dashboard-dialog-neutral-button bank-dialog-left-button'>

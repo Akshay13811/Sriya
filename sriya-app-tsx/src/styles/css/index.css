@@ -105,9 +105,9 @@ body {
   align-items: center;
   justify-content: center;
   width: 500px;
-  height: 280px;
+  height: 500px;
   left: 50%;
-  top: calc((100% - 280px)/2);
+  top: calc((100% - 500px)/2);
   margin-left: -250px;
   /* Negative half of width. */
   padding-left: 10px;
@@ -120,7 +120,7 @@ body {
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-rows: 40px 200px 40px;
+  grid-template-rows: 40px 420px 40px;
   grid-template-columns: repeat(3, 33.33%); }
 
 .dashboard-dialog-header {
@@ -129,6 +129,7 @@ body {
   color: rgba(255, 255, 255, 0.8); }
 
 .dashboard-dialog-container {
+  overflow-y: auto;
   grid-column: 1/4;
   display: flex;
   align-items: center;
@@ -224,12 +225,12 @@ body {
   width: 100%; }
 
 .dashboard-bank-form-bank-list {
-  width: 50%;
+  width: 70%;
   height: 100%;
   margin: auto;
   display: grid;
   grid-template-rows: 100%;
-  grid-template-columns: repeat(3, 33.33%); }
+  grid-template-columns: repeat(4, 1fr); }
 
 .dashboard-bank-form-bank-option {
   display: flex;
