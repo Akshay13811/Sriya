@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var TransactionSchema = new Schema({
-	date: Date,
+	date: Number,
 	description: String,
 	amount: Number
 });
