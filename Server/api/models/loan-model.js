@@ -8,7 +8,7 @@ var TransactionSchema = new Schema({
 	amount: Number
 });
 
-var AccountSchema = new Schema({
+var LoanSchema = new Schema({
 	bankName: {
 		type: String,
 		required: 'Please enter the name of the Bank'
@@ -18,11 +18,15 @@ var AccountSchema = new Schema({
 		unique: true,
 		required: 'Please enter the name of the Account'
 	},
+	loanAmount: {
+		type: Number,
+		required: 'Please enter the loan amount'
+	},
 	currentBalance: {
 		type: Number,
 	},
 	transactions: [TransactionSchema]
 });
 
-module.exports = mongoose.model('Account', AccountSchema);
-module.exports = mongoose.model('AccountTransaction', TransactionSchema);
+module.exports = mongoose.model('Loan', LoanSchema);
+module.exports = mongoose.model('LoanTransaction', TransactionSchema);

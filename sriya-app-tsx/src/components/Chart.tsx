@@ -15,8 +15,8 @@ export const ChartConfigurations = [
 	},
 	{
 		option: '1 Month',
-		period: 28,
-		interval: 2,
+		period: 30,
+		interval: 1,
 		numOfLabels: 4
 	},
 	{

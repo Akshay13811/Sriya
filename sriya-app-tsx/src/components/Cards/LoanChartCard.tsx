@@ -21,7 +21,7 @@ interface IState {
 	chartConfiguration: number;
 }
 
-export class AccountCard extends React.Component<IProps, IState> {
+export class LoanChartCard extends React.Component<IProps, IState> {
 	
 	constructor(props: IProps) {
 		super(props);
@@ -32,14 +32,14 @@ export class AccountCard extends React.Component<IProps, IState> {
 	}
 
 	componentDidMount() {
-		this.fetchAccountGraphData();
-		this.props.refreshCard(this.fetchAccountGraphData.bind(this));
+		this.fetchLoanGraphData();
+		this.props.refreshCard(this.fetchLoanGraphData.bind(this));
 	 }
 	
-	fetchAccountGraphData() {
+	fetchLoanGraphData() {
 		var period = ChartConfigurations[this.state.chartConfiguration].period;
 		var interval = ChartConfigurations[this.state.chartConfiguration].interval;
-		fetch(EndpointUrl+'/accounts/graph/'+period+'/'+interval, {mode: 'cors'})
+		fetch(EndpointUrl+'/loans/graph/'+period+'/'+interval, {mode: 'cors'})
 		.then(res => res.json()) //parses output to json
 		.then((data) => {
 			this.setState({
@@ -53,14 +53,14 @@ export class AccountCard extends React.Component<IProps, IState> {
 		this.setState({
 			chartConfiguration: configuration
 		}, () => {
-			this.fetchAccountGraphData();
+			this.fetchLoanGraphData();
 		})
 	}
 
 	render() {
 		return (
-			<div className="dashboard-account-card" style={{gridColumn: this.props.column, gridRow: this.props.row}}>
-				<div className="dashboard-card-header">{"Cash Total"}</div>
+			<div className="dashboard-loan-card" style={{gridColumn: this.props.column, gridRow: this.props.row}}>
+				<div className="dashboard-card-header">{"Loans"}</div>
 				<ChartOptions 
 					configuration={this.state.chartConfiguration}
 					changeConfiguration={(i) => this.changeConfiguration(i)}
@@ -68,7 +68,7 @@ export class AccountCard extends React.Component<IProps, IState> {
 				<Chart 
 					data={this.state.data}
 					configuration={this.state.chartConfiguration}
-					color={'rgba(116,184,255,1)'}
+					color={'rgba(255,118,116,1)'}
 				/>
 			</div>
 		);

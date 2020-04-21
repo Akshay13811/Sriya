@@ -428,6 +428,7 @@ input[type=date]::-webkit-inner-spin-button {
     grid-template-columns: 100%; } }
 
 .dashboard-account-card,
+.dashboard-loan-card,
 .dashboard-share-portfolio-card {
   background-color: #353a46;
   padding: 20px 20px 10px 20px;
@@ -437,7 +438,8 @@ input[type=date]::-webkit-inner-spin-button {
   flex-flow: column;
   align-items: stretch; }
 
-.dashboard-account-card {
+.dashboard-account-card,
+.dashboard-loan-card {
   display: grid;
   grid-template-rows: 25px auto;
   grid-template-columns: 33.33% 66.66%; }

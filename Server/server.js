@@ -4,6 +4,8 @@ var express = require('express'),
 	mongoose = require('mongoose'),
 	Account = require('./api/models/account-model'),
 	Share = require('./api/models/share-model'),
+	Loan = require('./api/models/loan-model'),
+	Asset = require('./api/models/asset-model'),
 	bodyParser = require('body-parser'),
 	fileUpload = require('express-fileupload');
 
@@ -23,8 +25,14 @@ app.use(bodyParser.json());
 var accountRoutes = require('./api/routes/account-routes');
 accountRoutes(app);
 
+var loanRoutes = require('./api/routes/loan-routes');
+loanRoutes(app);
+
 var shareRoutes = require('./api/routes/share-routes');
 shareRoutes(app);
+
+var assetRoutes = require('./api/routes/asset-routes');
+assetRoutes(app);
 
 app.listen(port);
 

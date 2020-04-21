@@ -1,7 +1,8 @@
 import React from 'react';
 
 //Components
-import { AccountCard } from './Cards/AccountCard';
+import { AccountChartCard } from './Cards/AccountChartCard';
+import { LoanChartCard } from './Cards/LoanChartCard'
 import { SharePortfolioCard } from './Cards/SharePortfolioCard';
 import { ShareChartCard } from './Cards/ShareChartCard';
 import { DashboardBar } from './DashboardBar';
@@ -19,6 +20,8 @@ interface IState {
 	shares: Array<IShare>;
 	sharesCombined: Array<IShare>;
 	refreshAccountCard: () => void;
+	refreshShareCard: () => void;
+	refreshLoanCard: () => void;
 }
 
 export class Dashboard extends React.Component<IProps, IState> {
@@ -29,7 +32,9 @@ export class Dashboard extends React.Component<IProps, IState> {
 			accounts: [],
 			shares: [],
 			sharesCombined: [],
-			refreshAccountCard: () => {}
+			refreshAccountCard: () => {},
+			refreshShareCard: () => {},
+			refreshLoanCard: () => {}
 		}
 	}
 
@@ -69,11 +74,13 @@ export class Dashboard extends React.Component<IProps, IState> {
 			})
 		})
 		.catch(console.log)
+
+		this.state.refreshShareCard();
 	}
 
 	renderAccountCard(row: number, column: number) {
 		return (
-			<AccountCard
+			<AccountChartCard
 				refreshCard={(callable: () => void) => this.setState({refreshAccountCard: callable})}
 				row = {row}
 				column = {column}
@@ -94,7 +101,17 @@ export class Dashboard extends React.Component<IProps, IState> {
 	renderShareChartCard(row: number, column: number) {
 		return (
 			<ShareChartCard
-				refreshCard={(callable: () => void) => this.setState({refreshAccountCard: callable})}
+				refreshCard={(callable: () => void) => this.setState({refreshShareCard: callable})}
+				row = {row}
+				column = {column}
+			/>
+		)
+	}
+
+	renderLoanChartCard(row: number, column: number) {
+		return (
+			<LoanChartCard
+				refreshCard={(callable: () => void) => this.setState({refreshLoanCard: callable})}
 				row = {row}
 				column = {column}
 			/>
@@ -119,8 +136,9 @@ export class Dashboard extends React.Component<IProps, IState> {
 					{this.renderBar()}
 				</div>
 				<div className="dashboard-main-container">
-					{this.renderAccountCard(1,1)}
+					{this.renderAccountCard(2,1)}
 					{this.renderSharePortfolioCard(2,3)}
+					{this.renderLoanChartCard(2,2)}
 					{this.renderShareChartCard(1,3)}
 				</div>
 			</div>

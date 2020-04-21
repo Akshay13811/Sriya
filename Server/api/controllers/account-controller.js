@@ -2,7 +2,7 @@
 
 var mongoose = require('mongoose');
 var Account = mongoose.model('Account');
-var Transaction = mongoose.model('Transaction');
+var Transaction = mongoose.model('AccountTransaction');
 var CSV = require('csv-string');
 
 const DAYINMS = 86400000;
@@ -63,7 +63,6 @@ exports.create_account = function(req, res) {
 			res.send(err);
 		res.json(account);
 	})
-	
 }
 
 exports.delete_account = function(req, res) {
@@ -467,12 +466,12 @@ function importINGFile(importFile, accountBalance) {
 	}
 }
 
-function combineAllData(accountsData, timePeriod, timeInterval) {
-	if(accountsData.length == 0) {
+function combineAllData(data, timePeriod, timeInterval) {
+	if(data.length == 0) {
 		return {};
 	}
-	else if(accountsData.length == 1) {
-		return accountsData[0];
+	else if(data.length == 1) {
+		return data[0];
 	}
 
 	var interval = DAYINMS*timeInterval;
@@ -483,14 +482,14 @@ function combineAllData(accountsData, timePeriod, timeInterval) {
 	var endDate = currentDate.getTime() - DAYINMS*timePeriod;
 
 	while(currentDate >= endDate) {
-		combinedData[currentDate.getTime()] = Math.round(accountsData[0][currentDate.getTime()])
-		for(var i=1; i<accountsData.length; i++) {
-			if(accountsData[i][currentDate.getTime()]) {
+		combinedData[currentDate.getTime()] = Math.round(data[0][currentDate.getTime()])
+		for(var i=1; i<data.length; i++) {
+			if(data[i][currentDate.getTime()]) {
 				if(!combinedData[currentDate.getTime()]) {
-					combinedData[currentDate.getTime()] = Math.round(accountsData[i][currentDate.getTime()])
+					combinedData[currentDate.getTime()] = Math.round(data[i][currentDate.getTime()])
 				}
 				else {
-					combinedData[currentDate.getTime()] += Math.round(accountsData[i][currentDate.getTime()])
+					combinedData[currentDate.getTime()] += Math.round(data[i][currentDate.getTime()])
 				}
 			}
 		}
@@ -541,6 +540,12 @@ function calculateGraphData(balance, transactions, timePeriod, timeInterval) {
 	
 		currentBalance -= transaction.amount / 100;
 		data[currentDate.getTime()] = currentBalance;
+	}
+
+	//Fill out all remaining dates with the current balance
+	while(currentDate >= endDate) {
+		data[currentDate.getTime()] = currentBalance;
+		currentDate = new Date(currentDate - interval);
 	}
 
 	return data;
