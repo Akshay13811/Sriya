@@ -1,17 +1,238 @@
 'use strict'
 
 var mongoose = require('mongoose');
-var Account = mongoose.model('Accounts');
-var Transaction = mongoose.model('Transactions');
+var Account = mongoose.model('Account');
+var Transaction = mongoose.model('Transaction');
 var CSV = require('csv-string');
 
 const DAYINMS = 86400000;
+
+/* --- Accounts --- */
 
 exports.list_accounts = function(req, res) {
 	Account.find({}, function(err, account) {
 		if(err)
 			res.send(err);
 		res.json(account)
+	});
+}
+
+exports.create_account = function(req, res) {
+	if(!req.files || Object.keys(req.files).length === 0) {
+		console.log('no files uploaded');
+	}
+
+	var currentBalance = 0;
+	var transactions = [];
+	if(req.files && Object.keys(req.files).length > 0) {
+		var accountBalance = null;
+		if(req.body.accountBalance) {
+			accountBalance = parseInt(req.body.accountBalance * 100);
+		}
+
+		if(req.body.bankName == "ING") {
+			var info = importINGFile(req.files.importFile, accountBalance);
+			transactions = info.transactions;
+			currentBalance = info.currentBalance;
+		}
+		else if(req.body.bankName == "UBANK") {
+			var info = importUBankFile(req.files.importFile, accountBalance);
+			transactions = info.transactions;
+			currentBalance = info.currentBalance;
+		}
+		else if(req.body.bankName == "RAMS") {
+			var info = importRamsFile(req.files.importFile, accountBalance);
+			transactions = info.transactions;
+			currentBalance = info.currentBalance;			
+		}
+		else if(req.body.bankName == "COMMBANK") {
+			var info = importCommBankFile(req.files.importFile, accountBalance);
+			transactions = info.transactions;
+			currentBalance = info.currentBalance;			
+		}
+	}
+	else if(req.body.currentBalance) {
+		currentBalance = req.body.currentBalance;
+	}
+
+	var new_account = new Account(req.body);
+	new_account.transactions = transactions;
+	new_account.currentBalance = currentBalance;
+	new_account.save(function(err, account) {
+		if(err)
+			res.send(err);
+		res.json(account);
+	})
+	
+}
+
+exports.delete_account = function(req, res) {
+	Account.remove({
+		_id: req.params.accountId
+	}, function(err, account) {
+		if (err)
+			res.send(err)
+		res.json({ message: 'Account successfully deleted' , success: true});
+	})
+}
+
+exports.update_account = function(req, res) {
+	Account.findOne({
+		_id: req.params.accountId
+	}, function(err, account) {
+		var currentBalance = account.currentBalance;
+		var transactions = [];
+		var balance = 0;
+		if(req.files && Object.keys(req.files).length > 0) {
+			if(account.bankName == "ING") {
+				var info = importINGFile(req.files.importFile);
+				transactions = info.transactions;
+				balance = info.currentBalance;
+			}
+			else if(account.bankName == "UBANK") {
+				var info = importUBankFile(req.files.importFile);
+				transactions = info.transactions;
+				balance = info.currentBalance;
+			}
+			else if(account.bankName == "RAMS") {
+				var info = importRamsFile(req.files.importFile);
+				transactions = info.transactions;
+				balance = info.currentBalance;			
+			}
+			else if(account.bankName == "COMMBANK") {
+				var info = importCommBankFile(req.files.importFile);
+				transactions = info.transactions;
+				balance = info.currentBalance;			
+			}
+		}
+
+		//Update account with new transactions
+		if(account.transactions.length == 0) {
+			//Import all transactions into the account
+			account.transactions = transactions;
+			account.currentBalance = balance;
+		}
+		else {
+			//Last transaction known by server for this account
+			let date = new Date(account.transactions[0].date)
+			let amount = account.transactions[0].amount;
+			let description = account.transactions[0].description;
+
+			//Find the last common transaction between the lists
+			var matchingTransactionIndex = 0;
+			for(var i=0; i<transactions.length; i++)
+			{
+				if(transactions[i].date == date.getTime() && transactions[i].amount == amount && transactions[i].description == description) {
+					console.log("Found last common transaction: " + i);
+					matchingTransactionIndex = i;
+					break;
+				}
+			}
+
+			if(matchingTransactionIndex != 0) {
+				//Prepend all transactions up to the last common transaction
+				var newTransactions = transactions.splice(0, matchingTransactionIndex);
+
+				for(var i=0; i<newTransactions.length; i++) {
+					currentBalance += newTransactions[i].amount
+				}
+
+				var updatedTransactions = newTransactions.concat(account.transactions);
+				account.transactions = updatedTransactions;
+				account.currentBalance = currentBalance;
+			}
+		}
+		account.save();	
+
+		if (err)
+			res.send(err);
+		res.json(account);
+
+	});
+  };
+
+exports.list_transactions = function(req, res) {
+	Account.findOne({
+		_id: req.params.accountId
+	}, function(err, account) {
+		if(err)
+			res.send(err);
+		else if(!account)
+			res.send({message: 'Specified account not found'})
+		else
+			res.json(account.transactions)
+	});
+}
+
+exports.create_transaction = function(req, res) {
+	Account.findOne({
+		_id: req.params.accountId
+	}, function(err, account) {
+		if(err)
+			res.send(err);
+		else if(!account)
+			res.send({message: 'Specified account not found'})
+		else {
+			var new_transaction = new Transaction(req.body);
+			account.transactions.push(new_transaction)
+			account.save();
+			res.json(account.transactions)
+		}
+	});
+}
+
+exports.delete_transaction = function(req, res) {
+	Account.update({
+		_id: req.params.accountId
+	}, {
+		$pull: {
+			transactions: {
+				_id: req.params.transactionId
+			}
+		}
+	},function(err, account) {
+		if (err)
+			res.send(err)
+		res.json({ message: 'Transaction successfully deleted' });
+	})
+}
+
+exports.update_transaction = function(req, res) {
+	var update = req.body;
+	update._id = req.params.transactionId
+	Account.findOneAndUpdate({
+		_id: req.params.accountId,
+		"transactions._id": req.params.transactionId
+	}, {
+		$set: {
+			"transactions.$": update
+		}
+	}, {
+		new: true
+	}, function(err, account) {
+		if (err)
+			res.send(err)
+		res.json(account);
+	})	
+}
+
+exports.graph_all_data = function(req, res) {
+	Account.find({}, function(err, accounts) {
+		if(err)
+			res.send(err);
+
+		var graphData = {};
+		if(parseInt(req.params.graphInterval) > parseInt(req.params.graphPeriod)) {
+			res.send("Requested interval cannot be larger than period")
+		}
+		else {
+			var accountsData = [];
+			for(var i=0; i<accounts.length; i++) {
+				accountsData.push(calculateGraphData(accounts[i].currentBalance, accounts[i].transactions, parseInt(req.params.graphPeriod), parseInt(req.params.graphInterval)));
+			}
+			graphData = combineAllData(accountsData, parseInt(req.params.graphPeriod), parseInt(req.params.graphInterval));
+		}
+		res.json(graphData)
 	});
 }
 
@@ -246,225 +467,6 @@ function importINGFile(importFile, accountBalance) {
 	}
 }
 
-exports.create_account = function(req, res) {
-	if(!req.files || Object.keys(req.files).length === 0) {
-		console.log('no files uploaded');
-	}
-
-	var currentBalance = 0;
-	var transactions = [];
-	if(req.files && Object.keys(req.files).length > 0) {
-		var accountBalance = null;
-		if(req.body.accountBalance) {
-			accountBalance = parseInt(req.body.accountBalance * 100);
-		}
-
-		if(req.body.bankName == "ING") {
-			var info = importINGFile(req.files.importFile, accountBalance);
-			transactions = info.transactions;
-			currentBalance = info.currentBalance;
-		}
-		else if(req.body.bankName == "UBANK") {
-			var info = importUBankFile(req.files.importFile, accountBalance);
-			transactions = info.transactions;
-			currentBalance = info.currentBalance;
-		}
-		else if(req.body.bankName == "RAMS") {
-			var info = importRamsFile(req.files.importFile, accountBalance);
-			transactions = info.transactions;
-			currentBalance = info.currentBalance;			
-		}
-		else if(req.body.bankName == "COMMBANK") {
-			var info = importCommBankFile(req.files.importFile, accountBalance);
-			transactions = info.transactions;
-			currentBalance = info.currentBalance;			
-		}
-	}
-	else if(req.body.currentBalance) {
-		currentBalance = req.body.currentBalance;
-	}
-
-	var new_account = new Account(req.body);
-	new_account.transactions = transactions;
-	new_account.currentBalance = currentBalance;
-	new_account.save(function(err, account) {
-		if(err)
-			res.send(err);
-		res.json(account);
-	})
-	
-}
-
-exports.delete_account = function(req, res) {
-	Account.remove({
-		_id: req.params.accountId
-	}, function(err, account) {
-		if (err)
-			res.send(err)
-		res.json({ message: 'Account successfully deleted' , success: true});
-	})
-}
-
-exports.update_account = function(req, res) {
-	Account.findOne({
-		_id: req.params.accountId
-	}, function(err, account) {
-		var currentBalance = account.currentBalance;
-		var transactions = [];
-		var balance = 0;
-		if(req.files && Object.keys(req.files).length > 0) {
-			if(account.bankName == "ING") {
-				var info = importINGFile(req.files.importFile);
-				transactions = info.transactions;
-				balance = info.currentBalance;
-			}
-			else if(account.bankName == "UBANK") {
-				var info = importUBankFile(req.files.importFile);
-				transactions = info.transactions;
-				balance = info.currentBalance;
-			}
-			else if(account.bankName == "RAMS") {
-				var info = importRamsFile(req.files.importFile);
-				transactions = info.transactions;
-				balance = info.currentBalance;			
-			}
-			else if(account.bankName == "COMMBANK") {
-				var info = importCommBankFile(req.files.importFile);
-				transactions = info.transactions;
-				balance = info.currentBalance;			
-			}
-		}
-
-		//Update account with new transactions
-		if(account.transactions.length == 0) {
-			//Import all transactions into the account
-			account.transactions = transactions;
-			account.currentBalance = balance;
-		}
-		else {
-			//Last transaction known by server for this account
-			let date = new Date(account.transactions[0].date)
-			let amount = account.transactions[0].amount;
-			let description = account.transactions[0].description;
-
-			//Find the last common transaction between the lists
-			var matchingTransactionIndex = 0;
-			for(var i=0; i<transactions.length; i++)
-			{
-				if(transactions[i].date == date.getTime() && transactions[i].amount == amount && transactions[i].description == description) {
-					console.log("Found last common transaction: " + i);
-					matchingTransactionIndex = i;
-					break;
-				}
-			}
-
-			if(matchingTransactionIndex != 0) {
-				//Prepend all transactions up to the last common transaction
-				var newTransactions = transactions.splice(0, matchingTransactionIndex);
-
-				for(var i=0; i<newTransactions.length; i++) {
-					currentBalance += newTransactions[i].amount
-				}
-
-				var updatedTransactions = newTransactions.concat(account.transactions);
-				account.transactions = updatedTransactions;
-				account.currentBalance = currentBalance;
-			}
-		}
-		account.save();	
-
-		if (err)
-			res.send(err);
-		res.json(account);
-
-	});
-  };
-
-exports.list_transactions = function(req, res) {
-	Account.findOne({
-		_id: req.params.accountId
-	}, function(err, account) {
-		if(err)
-			res.send(err);
-		else if(!account)
-			res.send({message: 'Specified account not found'})
-		else
-			res.json(account.transactions)
-	});
-}
-
-exports.create_transaction = function(req, res) {
-	Account.findOne({
-		_id: req.params.accountId
-	}, function(err, account) {
-		if(err)
-			res.send(err);
-		else if(!account)
-			res.send({message: 'Specified account not found'})
-		else {
-			var new_transaction = new Transaction(req.body);
-			account.transactions.push(new_transaction)
-			account.save();
-			res.json(account.transactions)
-		}
-	});
-}
-
-exports.delete_transaction = function(req, res) {
-	Account.update({
-		_id: req.params.accountId
-	}, {
-		$pull: {
-			transactions: {
-				_id: req.params.transactionId
-			}
-		}
-	},function(err, account) {
-		if (err)
-			res.send(err)
-		res.json({ message: 'Transaction successfully deleted' });
-	})
-}
-
-exports.update_transaction = function(req, res) {
-	var update = req.body;
-	update._id = req.params.transactionId
-	Account.findOneAndUpdate({
-		_id: req.params.accountId,
-		"transactions._id": req.params.transactionId
-	}, {
-		$set: {
-			"transactions.$": update
-		}
-	}, {
-		new: true
-	}, function(err, account) {
-		if (err)
-			res.send(err)
-		res.json(account);
-	})	
-}
-
-exports.graph_all_data = function(req, res) {
-	Account.find({}, function(err, accounts) {
-		if(err)
-			res.send(err);
-
-		var graphData = {};
-		if(parseInt(req.params.graphInterval) > parseInt(req.params.graphPeriod)) {
-			res.send("Requested interval cannot be larger than period")
-		}
-		else {
-			var accountsData = [];
-			for(var i=0; i<accounts.length; i++) {
-				accountsData.push(calculateGraphData(accounts[i].currentBalance, accounts[i].transactions, parseInt(req.params.graphPeriod), parseInt(req.params.graphInterval)));
-			}
-			graphData = combineAllData(accountsData, parseInt(req.params.graphPeriod), parseInt(req.params.graphInterval));
-		}
-		res.json(graphData)
-	});
-}
-
 function combineAllData(accountsData, timePeriod, timeInterval) {
 	if(accountsData.length == 0) {
 		return {};
@@ -501,6 +503,7 @@ function combineAllData(accountsData, timePeriod, timeInterval) {
 function calculateGraphData(balance, transactions, timePeriod, timeInterval) {
 	
 	var interval = DAYINMS*timeInterval;
+	
 	//Get current data
 	var currentDate = new Date();
 	currentDate.setHours(0, 0, 0, 0);

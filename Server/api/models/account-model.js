@@ -24,5 +24,5 @@ var AccountSchema = new Schema({
 	transactions: [TransactionSchema]
 });
 
-module.exports = mongoose.model('Accounts', AccountSchema);
-module.exports = mongoose.model('Transactions', TransactionSchema);
+module.exports = mongoose.model('Account', AccountSchema);
+module.exports = mongoose.model('Transaction', TransactionSchema);

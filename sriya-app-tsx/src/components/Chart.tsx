@@ -101,8 +101,8 @@ export class Chart extends React.Component<IProps> {
 		var keys = Object.keys(this.props.data);
 
 		if(this.props.configuration == 0) { // 1 Week
-			for(var key in keys) {
-				var date = new Date(key);
+			for(var i=0; i<keys.length; i++) {
+				var date = new Date(parseInt(keys[i]));
 				labels.push(days[date.getDay()]);
 			}
 		}

@@ -1,17 +1,19 @@
 import React from 'react';
 
 //Interfaces
-import {IGraphData} from '../interfaces/IGraphData';
+import {IGraphData} from '../../interfaces/IGraphData';
 
 //Components
-import {Chart, ChartConfigurations} from './Chart';
-import { ChartOptions } from './ChartOptions';
+import {Chart, ChartConfigurations} from '../Chart';
+import { ChartOptions } from '../ChartOptions';
 
 //Constants
-import {EndpointUrl} from '../Configuration';
+import {EndpointUrl} from '../../Configuration';
 
 interface IProps {
 	refreshCard: (refresh: () => void) => void;
+	row: number;
+	column: number;
 }
 
 interface IState {
@@ -19,7 +21,7 @@ interface IState {
 	chartConfiguration: number;
 }
 
-export class AccountCard extends React.Component<IProps, IState> {
+export class ShareChartCard extends React.Component<IProps, IState> {
 	
 	constructor(props: IProps) {
 		super(props);
@@ -37,7 +39,7 @@ export class AccountCard extends React.Component<IProps, IState> {
 	fetchAccountGraphData() {
 		var period = ChartConfigurations[this.state.chartConfiguration].period;
 		var interval = ChartConfigurations[this.state.chartConfiguration].interval;
-		fetch(EndpointUrl+'/accounts/graph/'+period+'/'+interval, {mode: 'cors'})
+		fetch(EndpointUrl+'/shares/graph/'+period+'/'+interval, {mode: 'cors'})
 		.then(res => res.json()) //parses output to json
 		.then((data) => {
 			this.setState({
@@ -57,8 +59,8 @@ export class AccountCard extends React.Component<IProps, IState> {
 
 	render() {
 		return (
-			<div className="dashboard-card">
-				<div className="dashboard-card-header">{"Cash Total"}</div>
+			<div className="dashboard-account-card" style={{gridColumn: this.props.column, gridRow: this.props.row}}>
+				<div className="dashboard-card-header">{"Shares"}</div>
 				<ChartOptions 
 					configuration={this.state.chartConfiguration}
 					changeConfiguration={(i) => this.changeConfiguration(i)}
@@ -66,7 +68,7 @@ export class AccountCard extends React.Component<IProps, IState> {
 				<Chart 
 					data={this.state.data}
 					configuration={this.state.chartConfiguration}
-					color={'rgba(116,184,255,1)'}
+					color={'rgba(253,202,110,1)'}
 				/>
 			</div>
 		);

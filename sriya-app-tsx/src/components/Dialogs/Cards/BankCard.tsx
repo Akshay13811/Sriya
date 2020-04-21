@@ -1,10 +1,10 @@
 import React from 'react';
 
 //Interfaces
-import {IAccount} from '../../interfaces/IAccount';
+import {IAccount} from '../../../interfaces/IAccount';
 
 //Constants
-import {EndpointUrl} from '../../Configuration';
+import {EndpointUrl} from '../../../Configuration';
 
 interface IProps {
 	account: IAccount;

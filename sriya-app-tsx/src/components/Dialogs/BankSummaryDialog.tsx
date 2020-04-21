@@ -4,7 +4,7 @@ import React from 'react';
 import { IAccount } from '../../interfaces/IAccount';
 
 //Components
-import { BankCard } from '../Cards/BankCard';
+import { BankCard } from './Cards/BankCard';
 
 interface IProps {
 	showDialog: boolean;
@@ -23,19 +23,19 @@ export class BankSummaryDialog extends React.Component<IProps> {
 	render() {
 		return (
 			<div className={this.props.showDialog ? 'dashboard-menu-dialog fadeIn' : 'dashboard-menu-dialog fadeOut'} onClick={(e) => this.dialogClick(e)}>
-				<div className="dashboard-bank-dialog">
+				<div className="dashboard-dialog">
 					<div className="dashboard-dialog-header">
 						Bank Accounts
 					</div>
 					<div className="dashboard-dialog-container">
-						<div className="dashboard-bank-summary">
+						<div className="dashboard-summary-dialog">
 							{this.props.accounts.map(account => (
 								<BankCard
 									account = {account}
 									refreshData = {() => this.props.refreshData()}
 								/>
 							))}
-							<div className={this.props.accounts.length == 0 ? 'dashboard-bank-summary fadeIn' : 'dashboard-bank-summary fadeOut'}>
+							<div className={this.props.accounts.length == 0 ? 'dashboard-summary-dialog fadeIn' : 'dashboard-summary-dialog fadeOut'}>
 								<p>You do not have any bank accounts</p>	
 							</div>
 						</div>

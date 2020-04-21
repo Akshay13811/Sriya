@@ -4,14 +4,17 @@ $FontPathOpenSans: "../../../node_modules/npm-font-open-sans/fonts";
 //Variables
 $dashboard-colour: #2A303C;
 $dashboard-bar-width: 50px;
+$dashboard-share-card-height: 40px;
 $dashboard-dialog-height: 500px;
-$dashboard-dialog-width: 500px;
+$dashboard-dialog-width: 620px;
 $dashboard-dialog-header-height: 40px;
 $dashboard-dialog-footer-height: 40px;
 $dashboard-button-green-color: #81C784;
 $dashboard-button-red-color: #ef5350;
 $dashboard-button-color: #90CAF9;
 $dashboard-card-header-height: 25px;
+$dashboard-share-portfolio-card-gap: 15px;
+$dashboard-dialog-share-column: 2fr 2fr 4fr 4fr 3fr 3fr 1fr 1fr;
 
 //CSS variables
 :root {
@@ -27,6 +30,17 @@ body {
 	margin: 0px;
 }	
 
+[contenteditable=true]:empty:before{
+	content: attr(placeholder);
+	pointer-events: none;
+	display: block; /* For Firefox */
+}
+
+input[type=date]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    display: none;
+}
+
 .hidden {
 	display: none !important;
 }
@@ -35,12 +49,13 @@ body {
 	opacity:0;
 	z-index: -1;
 	height: 0px !important;
-	transition: opacity 0.3s, z-index 0s 0.3s, display 0s 0.3s, height 0s 0.3s;
+	padding: 0px !important;
+	transition: opacity 0.3s, z-index 0s 0.3s, height 0s 0.3s, padding 0s 0.3s;
 }
 
 .fadeIn{
 	opacity:1;
-	transition: opacity 0.3s 0.3s, display 0.3s 0.3s, height 0.3s 0.3s;
+	transition: opacity 0.3s 0.3s, height 0.3s 0.3s;
 	z-index: 1;
 }
 
@@ -56,7 +71,7 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 500px;
+	width: $dashboard-dialog-width;
 	height: $dashboard-dialog-height;
 	left: 50%;
 	top: calc((100% - #{$dashboard-dialog-height})/2);
@@ -68,13 +83,13 @@ body {
 	border-radius: 5px;
 }
 
-.dashboard-bank-dialog {
+.dashboard-dialog {
 	width: 100%;
 	height: 100%;
 	display: grid;
 	grid-template-rows: $dashboard-dialog-header-height 420px $dashboard-dialog-footer-height;
 	grid-template-columns: repeat(3, 33.33%);
-}
+} 	
 
 .dashboard-dialog-header {
 	grid-column: 1/4;
@@ -133,18 +148,135 @@ body {
 	background-color: #A5D6A7;
 }
 
+.dashboard-summary-dialog-table-header {
+	display: grid;
+	grid-template-columns: $dashboard-dialog-share-column;
+	width: 100%;
+}
+
+.dashboard-summary-table-header-column {
+	background-color: mix(white, $dashboard-colour, 5);
+	font-size: 12px;
+	text-align: center;
+	padding: 5px;
+	color: white;
+}
+
+.dashboard-add-share,
+.dashboard-add-share-config-card {
+	box-sizing: border-box;
+	border-radius: 5px;
+	border: 1px dashed mix(white, $dashboard-colour, 10);
+	width: 100%;
+
+	font-size: 12px;
+	text-align: center;
+}
+
+.dashboard-add-share {
+	padding: 5px;
+}
+
+.dashboard-add-share:hover {
+	cursor: pointer;
+}
+
+.dashboard-add-share-config-card {
+	display: grid;
+	grid-template-rows: auto;
+	grid-template-columns: $dashboard-dialog-share-column;
+}
+
+.dashboard-add-share-config-card>div {	
+	font-size: 12px;
+	text-align: center;
+
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.dashboard-share-config-card>div>div>div>input,
+.dashboard-add-share-config-card>div>div>div>input {	
+	width: 100%;
+	box-sizing: border-box;
+	background-color: transparent;
+	border: 0px;
+	color: inherit;
+	text-align: center;
+	font-size: 12px;
+}
+
+.dashboard-share-sold-date>input[type=checkbox],
+.dashboard-share-sold-date>input[type=checkbox] {
+	width: 14px;
+	height: 100%;
+	margin: 0px;
+}
+
+.dashboard-share-sold-date {
+	display: grid;
+	grid-template-columns: 1fr 5fr;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.dashboard-share-purchase-date {
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.dashboard-share-config-card {
+	display: grid;
+	grid-template-columns: $dashboard-dialog-share-column;
+
+	font-size: 12px;
+	text-align: center;
+}
+
+.dashboard-share-config-card-item {
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.dashboard-share-config-card-tick-icon,
+.dashboard-share-config-card-cross-icon,
+.dashboard-share-config-card-edit-icon,
+.dashboard-share-config-card-delete-icon {
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.dashboard-share-config-card-tick-icon:hover {
+	background-color: $dashboard-button-green-color;
+	cursor: pointer;
+}
+
+.dashboard-share-config-card-edit-icon:hover {
+	background-color: $dashboard-button-color;
+	cursor: pointer;
+}
+
+.dashboard-share-config-card-cross-icon:hover,
+.dashboard-share-config-card-delete-icon:hover {
+	background-color: $dashboard-button-red-color;
+	cursor: pointer;
+}
+
+.dashboard-bank-card {
+	grid-template-columns: repeat(3, 1fr);
+	padding: 10px;
+}
+
+.dashboard-share-config-card,
 .dashboard-bank-card {
 	background-color: mix(white, $dashboard-colour, 5);
 	border: 1px solid mix(white, $dashboard-colour, 10);
-	padding: 10px;
-	margin-bottom: 5px;
 	border-radius: 5px;
 	width: 100%;
 	box-sizing: border-box;
 
 	display: grid;
-	grid-template-rows: 25px;
-	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: auto;
 }
 
 .dashboard-bank-card-name {
@@ -190,11 +322,14 @@ body {
 	height: 100%;
 }
 
-.dashboard-bank-summary {
+.dashboard-summary-dialog {
 	transition: 0.3s;
 	top: 0px;
 	height: 100%;
 	width: 100%;
+	display: grid;
+	grid-auto-rows: max-content;
+	row-gap: 5px;
 }
 
 .dashboard-bank-form-bank-list {
@@ -292,7 +427,7 @@ body {
 
 .dashboard-main-container {
 	display: grid;
-	grid-template-rows: repeat(9, 33.33%);
+	grid-template-rows: repeat(2, 45%);
 	grid-template-columns: repeat(3, 33.33%);
 
 	position: relative;
@@ -310,23 +445,33 @@ body {
 	}
 }
 
-.dashboard-card {
+.dashboard-account-card,
+.dashboard-share-portfolio-card {
 	background-color: mix(white, $dashboard-colour, 5);
-	padding: 10px 20px 10px 20px;
+	padding: 20px 20px 10px 20px;
 	margin: 5px;
 	box-sizing: border-box;
 
 	flex: 1 1 auto;
 	flex-flow: column;
 	align-items: stretch;	
+}	
 
+.dashboard-account-card {	
 	display: grid;
 	grid-template-rows: $dashboard-card-header-height auto;
 	grid-template-columns: 33.33% 66.66%;
-}	
+}
+
+.dashboard-share-portfolio-card {
+	display: grid;
+	grid-template-columns: 100%;
+	grid-template-rows: $dashboard-card-header-height + $dashboard-share-portfolio-card-gap repeat(auto-fit, $dashboard-share-card-height);
+	grid-row-gap: 5px;
+}
 
 .dashboard-chart {
-	padding-top:10px;
+	padding-top: 35px;
 	overflow: hidden;
 	flex: 1 1 auto;
 
@@ -405,4 +550,48 @@ body {
 
 .select {
 	background-color: rgba(116, 184, 255, 0.5);
+}
+
+.dashboard-share-card {
+	background-color: rgba(255,255,255,0.1);
+	height: 100%;
+	padding-right: 10px;
+	box-sizing: border-box;
+	font-size: 8.5pt;
+	color: white;
+
+	display: grid;
+	grid-template-columns: 2fr 2fr 6fr repeat(3, 3fr);
+	align-items: center;
+	justify-content: center;
+}
+
+.center-text,
+.center-icon {
+	text-align: center;
+}
+
+.right-text {
+	text-align: right;
+}
+
+.left-text {
+	text-align: left;
+}
+
+.double-row {
+	display: grid;
+	grid-template-rows: 50%;
+}
+
+.red-text {
+	color: $dashboard-button-red-color;
+}
+
+.green-text {
+	color: $dashboard-button-green-color;
+}
+
+.neutral-text {
+	color: rgba(255,255,255,0.5);
 }

@@ -24,7 +24,7 @@ export class BankNewSelectionDialog extends React.Component<IProps> {
 	render() {
 		return (
 			<div className={this.props.showDialog ? 'dashboard-menu-dialog fadeIn' : 'dashboard-menu-dialog fadeOut'} onClick={(e) => this.dialogClick(e)}>
-				<div className="dashboard-bank-dialog">
+				<div className="dashboard-dialog">
 					<div className="dashboard-dialog-header">
 						Bank Accounts
 					</div>

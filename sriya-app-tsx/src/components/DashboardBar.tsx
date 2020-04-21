@@ -8,9 +8,11 @@ import {ReactComponent as HomeIcon} from '../images/home2.svg';
 
 //Interfaces
 import {IAccount} from '../interfaces/IAccount';
+import {IShare} from '../interfaces/IShare';
 
 //Components
 import {BankDialog, BankName} from '../Components/Dialogs/BankDialog'
+import {SharesDialog} from './Dialogs/SharesDialog'
 
 //Images
 import ingIcon from '../images/ing.jpg';
@@ -22,7 +24,9 @@ import {EndpointUrl} from '../Configuration';
 
 interface IDashboardBarProps {
 	accounts: Array<IAccount>
+	shares: Array<IShare>
 	refreshAccountData: () => void;
+	refreshShareData: () => void;
 }
 
 interface IDashboardBarState {
@@ -81,6 +85,12 @@ export class DashboardBar extends React.Component<IDashboardBarProps, IDashboard
 		})	
 	}
 
+	hideSharesDialog() {
+		this.setState({
+			showSharesDialog: false
+		})	
+	}
+
 	dialogClick(e: React.MouseEvent) {
 		e.stopPropagation();
 	}
@@ -104,10 +114,17 @@ export class DashboardBar extends React.Component<IDashboardBarProps, IDashboard
 				</div>
 
 				<BankDialog 
-						showDialog = {this.state.showBankDialog}
-						hideDialogCallback = {() => this.hideBankDialog()}
-						accounts = {this.props.accounts}
-						refreshAccountData = {() => this.props.refreshAccountData()}
+					showDialog = {this.state.showBankDialog}
+					hideDialogCallback = {() => this.hideBankDialog()}
+					accounts = {this.props.accounts}
+					refreshAccountData = {() => this.props.refreshAccountData()}
+				/>
+
+				<SharesDialog
+					showDialog = {this.state.showSharesDialog}
+					hideDialogCallback = {() => this.hideSharesDialog()}
+					shares = {this.props.shares}
+					refreshShareData = {() => this.props.refreshShareData()}					
 				/>
 			</div>
 		);

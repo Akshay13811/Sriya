@@ -79,6 +79,16 @@ body {
   font-family: 'Open Sans';
   margin: 0px; }
 
+[contenteditable=true]:empty:before {
+  content: attr(placeholder);
+  pointer-events: none;
+  display: block;
+  /* For Firefox */ }
+
+input[type=date]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  display: none; }
+
 .hidden {
   display: none !important; }
 
@@ -86,11 +96,12 @@ body {
   opacity: 0;
   z-index: -1;
   height: 0px !important;
-  transition: opacity 0.3s, z-index 0s 0.3s, display 0s 0.3s, height 0s 0.3s; }
+  padding: 0px !important;
+  transition: opacity 0.3s, z-index 0s 0.3s, height 0s 0.3s, padding 0s 0.3s; }
 
 .fadeIn {
   opacity: 1;
-  transition: opacity 0.3s 0.3s, display 0.3s 0.3s, height 0.3s 0.3s;
+  transition: opacity 0.3s 0.3s, height 0.3s 0.3s;
   z-index: 1; }
 
 .dashboard-menu-dialogs {
@@ -104,11 +115,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 500px;
+  width: 620px;
   height: 500px;
   left: 50%;
   top: calc((100% - 500px)/2);
-  margin-left: -250px;
+  margin-left: -310px;
   /* Negative half of width. */
   padding-left: 10px;
   padding-right: 10px;
@@ -116,7 +127,7 @@ body {
   background-color: #2A303C;
   border-radius: 5px; }
 
-.dashboard-bank-dialog {
+.dashboard-dialog {
   width: 100%;
   height: 100%;
   display: grid;
@@ -170,17 +181,113 @@ body {
 .dashboard-dialog-green-button:hover {
   background-color: #A5D6A7; }
 
+.dashboard-summary-dialog-table-header {
+  display: grid;
+  grid-template-columns: 2fr 2fr 4fr 4fr 3fr 3fr 1fr 1fr;
+  width: 100%; }
+
+.dashboard-summary-table-header-column {
+  background-color: #353a46;
+  font-size: 12px;
+  text-align: center;
+  padding: 5px;
+  color: white; }
+
+.dashboard-add-share,
+.dashboard-add-share-config-card {
+  box-sizing: border-box;
+  border-radius: 5px;
+  border: 1px dashed #3f4550;
+  width: 100%;
+  font-size: 12px;
+  text-align: center; }
+
+.dashboard-add-share {
+  padding: 5px; }
+
+.dashboard-add-share:hover {
+  cursor: pointer; }
+
+.dashboard-add-share-config-card {
+  display: grid;
+  grid-template-rows: auto;
+  grid-template-columns: 2fr 2fr 4fr 4fr 3fr 3fr 1fr 1fr; }
+
+.dashboard-add-share-config-card > div {
+  font-size: 12px;
+  text-align: center;
+  padding-top: 5px;
+  padding-bottom: 5px; }
+
+.dashboard-share-config-card > div > div > div > input,
+.dashboard-add-share-config-card > div > div > div > input {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: transparent;
+  border: 0px;
+  color: inherit;
+  text-align: center;
+  font-size: 12px; }
+
+.dashboard-share-sold-date > input[type=checkbox],
+.dashboard-share-sold-date > input[type=checkbox] {
+  width: 14px;
+  height: 100%;
+  margin: 0px; }
+
+.dashboard-share-sold-date {
+  display: grid;
+  grid-template-columns: 1fr 5fr;
+  padding-top: 5px;
+  padding-bottom: 5px; }
+
+.dashboard-share-purchase-date {
+  padding-top: 5px;
+  padding-bottom: 5px; }
+
+.dashboard-share-config-card {
+  display: grid;
+  grid-template-columns: 2fr 2fr 4fr 4fr 3fr 3fr 1fr 1fr;
+  font-size: 12px;
+  text-align: center; }
+
+.dashboard-share-config-card-item {
+  padding-top: 5px;
+  padding-bottom: 5px; }
+
+.dashboard-share-config-card-tick-icon,
+.dashboard-share-config-card-cross-icon,
+.dashboard-share-config-card-edit-icon,
+.dashboard-share-config-card-delete-icon {
+  padding-top: 5px;
+  padding-bottom: 5px; }
+
+.dashboard-share-config-card-tick-icon:hover {
+  background-color: #81C784;
+  cursor: pointer; }
+
+.dashboard-share-config-card-edit-icon:hover {
+  background-color: #90CAF9;
+  cursor: pointer; }
+
+.dashboard-share-config-card-cross-icon:hover,
+.dashboard-share-config-card-delete-icon:hover {
+  background-color: #ef5350;
+  cursor: pointer; }
+
+.dashboard-bank-card {
+  grid-template-columns: repeat(3, 1fr);
+  padding: 10px; }
+
+.dashboard-share-config-card,
 .dashboard-bank-card {
   background-color: #353a46;
   border: 1px solid #3f4550;
-  padding: 10px;
-  margin-bottom: 5px;
   border-radius: 5px;
   width: 100%;
   box-sizing: border-box;
   display: grid;
-  grid-template-rows: 25px;
-  grid-template-columns: repeat(3, 1fr); }
+  grid-template-rows: auto; }
 
 .dashboard-bank-card-name {
   grid-column: 1; }
@@ -218,11 +325,14 @@ body {
   position: relative;
   height: 100%; }
 
-.dashboard-bank-summary {
+.dashboard-summary-dialog {
   transition: 0.3s;
   top: 0px;
   height: 100%;
-  width: 100%; }
+  width: 100%;
+  display: grid;
+  grid-auto-rows: max-content;
+  row-gap: 5px; }
 
 .dashboard-bank-form-bank-list {
   width: 70%;
@@ -303,7 +413,7 @@ body {
 
 .dashboard-main-container {
   display: grid;
-  grid-template-rows: repeat(9, 33.33%);
+  grid-template-rows: repeat(2, 45%);
   grid-template-columns: repeat(3, 33.33%);
   position: relative;
   height: 100vh;
@@ -317,20 +427,29 @@ body {
   .dashboard-main-container {
     grid-template-columns: 100%; } }
 
-.dashboard-card {
+.dashboard-account-card,
+.dashboard-share-portfolio-card {
   background-color: #353a46;
-  padding: 10px 20px 10px 20px;
+  padding: 20px 20px 10px 20px;
   margin: 5px;
   box-sizing: border-box;
   flex: 1 1 auto;
   flex-flow: column;
-  align-items: stretch;
+  align-items: stretch; }
+
+.dashboard-account-card {
   display: grid;
   grid-template-rows: 25px auto;
   grid-template-columns: 33.33% 66.66%; }
 
+.dashboard-share-portfolio-card {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 40px repeat(auto-fit, 40px);
+  grid-row-gap: 5px; }
+
 .dashboard-chart {
-  padding-top: 10px;
+  padding-top: 35px;
   overflow: hidden;
   flex: 1 1 auto;
   grid-column-start: 1;
@@ -392,3 +511,38 @@ body {
 
 .select {
   background-color: rgba(116, 184, 255, 0.5); }
+
+.dashboard-share-card {
+  background-color: rgba(255, 255, 255, 0.1);
+  height: 100%;
+  padding-right: 10px;
+  box-sizing: border-box;
+  font-size: 8.5pt;
+  color: white;
+  display: grid;
+  grid-template-columns: 2fr 2fr 6fr repeat(3, 3fr);
+  align-items: center;
+  justify-content: center; }
+
+.center-text,
+.center-icon {
+  text-align: center; }
+
+.right-text {
+  text-align: right; }
+
+.left-text {
+  text-align: left; }
+
+.double-row {
+  display: grid;
+  grid-template-rows: 50%; }
+
+.red-text {
+  color: #ef5350; }
+
+.green-text {
+  color: #81C784; }
+
+.neutral-text {
+  color: rgba(255, 255, 255, 0.5); }
