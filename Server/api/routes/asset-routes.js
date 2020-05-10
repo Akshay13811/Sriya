@@ -21,4 +21,7 @@ module.exports = function(app) {
 
 	app.route('/assets/graph/:graphPeriod/:graphInterval')
 		.get(assets.graph_all_data)
+
+	app.route('/assets/total')
+		.get(assets.get_total)
 }

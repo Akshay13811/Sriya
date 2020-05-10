@@ -13,4 +13,7 @@ module.exports = function(app) {
 
 	app.route('/loans/graph/:graphPeriod/:graphInterval')
 		.get(loans.graph_all_data)
+
+	app.route('/loans/total')
+		.get(loans.get_total)
 }

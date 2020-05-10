@@ -68,6 +68,8 @@ exports.update_loan = function(req, res) {
 			}
 		}
 
+		loan.loanAmount = req.body.loanAmount;
+
 		//Update loan with new transactions
 		if(loan.transactions.length == 0) {
 			//Import all transactions into the loan
@@ -108,32 +110,66 @@ exports.update_loan = function(req, res) {
 
 		if (err)
 			res.send(err);
-		res.json(loan);
+		res.json({ loan: loan, success: true});
 
 	});
   };
 
-  exports.graph_all_data = function(req, res) {
-	Loan.find({}, function(err, loans) {
-		if(err)
-			res.send(err);
+exports.graph_all_data = function(req, res) {
+	processGraphData(parseInt(req.params.graphPeriod), parseInt(req.params.graphInterval), res);
+}
 
-		var graphData = {};
-		if(parseInt(req.params.graphInterval) > parseInt(req.params.graphPeriod)) {
-			res.send("Requested interval cannot be larger than period")
+exports.get_total = function(req, res) {
+	Loan.find({}, function(err, loans) {
+		var total = 0;
+		for(var i=0; i<loans.length; i++) {
+			total += loans[i].currentBalance;
 		}
-		else {
-			var loansData = [];
-			for(var i=0; i<loans.length; i++) {
-				loansData.push(calculateGraphData(loans[i], parseInt(req.params.graphPeriod), parseInt(req.params.graphInterval)));
-			}
-			graphData = combineAllData(loansData, parseInt(req.params.graphPeriod), parseInt(req.params.graphInterval));
-		}
-		res.json(graphData)
+		res.json({"total" : total})
 	});
 }
 
-  function importINGFile(importFile) {
+exports.get_all_loans_query = getAllLoansQuery
+exports.get_combined_graph_data = getCombinedGraphData
+
+function getAllLoansQuery() {
+	 var query = Loan.find({});
+	 return query;
+}
+
+function getCombinedGraphData(loans, period, interval) {
+	var loansData = [];
+	for(var i=0; i<loans.length; i++) {
+		loansData.push(calculateGraphData(loans[i], period, interval));
+	}
+
+	var graphData = combineAllData(loansData, period, interval);
+	return graphData;
+}
+
+function processGraphData(period, interval, res) {
+	var graphData = {}; 
+
+	if(interval > period) {
+		res.send({error: "Requested interval cannot be larger than period"})
+		return;
+	}
+
+	Loan.find({}).then(loans => {
+			graphData = getCombinedGraphData(loans, period, interval);
+			if(res) {
+				res.send(graphData);
+			}
+		}
+		, err => {
+			throw new Error("An error occurred when accessing loan data")
+		}
+	);
+
+	return;
+}
+
+function importINGFile(importFile) {
 	var csvData = importFile.data.toString('utf8');
 	var entries = csvData.split('\n');
 	var transactions = [];
@@ -188,9 +224,9 @@ function combineAllData(data, timePeriod, timeInterval) {
 	var combinedData = {};
 	var currentDate = new Date();
 	currentDate.setHours(0, 0, 0, 0);
-	var endDate = currentDate.getTime() - DAYINMS*timePeriod;
+	var lastDate = currentDate.getTime() - DAYINMS*timePeriod;
 
-	while(currentDate >= endDate) {
+	while(currentDate >= lastDate) {
 		combinedData[currentDate.getTime()] = Math.round(data[0][currentDate.getTime()])
 		for(var i=1; i<data.length; i++) {
 			if(data[i][currentDate.getTime()]) {
@@ -202,7 +238,9 @@ function combineAllData(data, timePeriod, timeInterval) {
 				}
 			}
 		}
-		currentDate = new Date(currentDate - interval);
+		var updatedDates = getNextDates(currentDate, lastDate, interval);
+		currentDate = updatedDates.currentDate;
+		lastDate = updatedDates.lastDate;
 	}
 
 	return combinedData;
@@ -210,58 +248,67 @@ function combineAllData(data, timePeriod, timeInterval) {
 
 function calculateGraphData(loanData, timePeriod, timeInterval) {
 	
+	console.log("*** Loans - Getting Graph Data ***");
+
 	var interval = DAYINMS*timeInterval;
 	
 	//Get current data
 	var currentDate = new Date();
 	currentDate.setHours(0, 0, 0, 0);
 
-	var endDate = currentDate.getTime() - DAYINMS*timePeriod;
+	var lastDate = currentDate.getTime() - DAYINMS*timePeriod;
 
 	var currentBalance = loanData.currentBalance / 100;
 	var data = {}
-
-	//Set current balance for current date
-	data[currentDate.getTime()] = currentBalance;
-
-	//Change current date to the next date
-	currentDate = new Date(currentDate - interval);
-	data[currentDate.getTime()] = currentBalance;
                                                                                                        
 	for(var i=0; i<loanData.transactions.length; i++) {
 		var transaction = loanData.transactions[i];
 		var transactionDate = new Date(transaction.date);
 
-		if(transactionDate.getTime() <= endDate) {
-			//Fill out all remaining intervals with current balance
-			currentDate = new Date(currentDate - interval);
-			while(currentDate >= endDate) {
-				data[currentDate.getTime()] = currentBalance;
-				currentDate = new Date(currentDate - interval);
-			}
+		if(transactionDate.getTime() <= lastDate) {
 			break;
 		}
 
 		while(transactionDate.getTime() <= currentDate.getTime()) {
-			currentDate = new Date(currentDate - interval);
 			data[currentDate.getTime()] = currentBalance;
+			var updatedDates = getNextDates(currentDate, lastDate, interval);
+			currentDate = updatedDates.currentDate;
+			lastDate = updatedDates.lastDate;
 		}
 	
 		currentBalance -= transaction.amount / 100;
+		data[currentDate.getTime()] = currentBalance;
 
 		//Ensure that the last non-zero data point is the loan amount
 		if(currentBalance == 0 && data[currentDate.getTime() + interval] && data[currentDate.getTime() + interval] != loanData.loanAmount && data[currentDate.getTime() + interval] != 0) {
 			data[currentDate.getTime() + interval] = loanData.loanAmount;
 		}
-
-		data[currentDate.getTime()] = currentBalance;
 	}
 
 	//Fill out all remaining dates with the current balance
-	while(currentDate >= endDate) {
+	while(currentDate >= lastDate) {
 		data[currentDate.getTime()] = currentBalance;
-		currentDate = new Date(currentDate - interval);
+		var updatedDates = getNextDates(currentDate, lastDate, interval);
+		currentDate = updatedDates.currentDate;
+		lastDate = updatedDates.lastDate;
 	}
 
+	console.log("*** Loans - Exit Getting Graph Data ***");
 	return data;
+}
+
+function getNextDates(currentDate, lastDate, interval) {
+	var oldTimeOffset = currentDate.getTimezoneOffset();
+	currentDate = new Date(currentDate - interval); 
+	var newTimeOffset = currentDate.getTimezoneOffset();
+
+	if(oldTimeOffset != newTimeOffset) { //Compenstate for DST
+		currentDate = new Date(currentDate.getTime() + ((newTimeOffset - oldTimeOffset) * 60 * 1000));
+		lastDate = lastDate + ((newTimeOffset - oldTimeOffset) * 60 * 1000);
+	}
+
+	return {
+		"currentDate" : currentDate, 
+		"lastDate": lastDate
+	}
 }

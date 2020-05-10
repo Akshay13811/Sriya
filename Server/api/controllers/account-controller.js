@@ -216,23 +216,58 @@ exports.update_transaction = function(req, res) {
 }
 
 exports.graph_all_data = function(req, res) {
-	Account.find({}, function(err, accounts) {
-		if(err)
-			res.send(err);
+	processGraphData(parseInt(req.params.graphPeriod), parseInt(req.params.graphInterval), res);
+}
 
-		var graphData = {};
-		if(parseInt(req.params.graphInterval) > parseInt(req.params.graphPeriod)) {
-			res.send("Requested interval cannot be larger than period")
+exports.get_total = function(req, res) {
+	Account.find({}, function(err, accounts) {
+		var total = 0;
+		for(var i=0; i<accounts.length; i++) {
+			total += accounts[i].currentBalance;
 		}
-		else {
-			var accountsData = [];
-			for(var i=0; i<accounts.length; i++) {
-				accountsData.push(calculateGraphData(accounts[i].currentBalance, accounts[i].transactions, parseInt(req.params.graphPeriod), parseInt(req.params.graphInterval)));
-			}
-			graphData = combineAllData(accountsData, parseInt(req.params.graphPeriod), parseInt(req.params.graphInterval));
-		}
-		res.json(graphData)
+		res.json({"total" : total})
 	});
+}
+
+exports.get_all_accounts_query = getAllAccountsQuery
+exports.get_combined_graph_data = getCombinedGraphData
+
+function getAllAccountsQuery() {
+	var query = Account.find({});
+	return query;
+}
+
+function getCombinedGraphData(accounts, period, interval) {
+	var accountsData = [];
+	for(var i=0; i<accounts.length; i++) {
+		accountsData.push(calculateGraphData(accounts[i].currentBalance, accounts[i].transactions, period, interval));
+	}
+
+	var graphData = combineAllData(accountsData, period, interval);
+	return graphData;
+}
+
+function processGraphData(period, interval, res) {
+	var graphData = {}; 
+
+	if(interval > period) {
+		res.send({error: "Requested interval cannot be larger than period"})
+		return;
+	}
+
+	Account.find({}).then(accounts => {
+			graphData = getCombinedGraphData(accounts, period, interval);
+			console.log(graphData);
+			if(res) {
+				res.send(graphData);
+			}
+		}
+		, err => {
+			throw new Error("An error occurred when accessing account data")
+		}
+	);
+
+	return;
 }
 
 function importCommBankFile(importFile, accountBalance) {
@@ -425,11 +460,11 @@ function importINGFile(importFile, accountBalance) {
 			var entry = entries[i].split(',');
 
 			var amount = 0;
-			if(entry[entry.length-2] != "") {
-				amount = Math.round(parseFloat(entry[entry.length-2])*100);
+			if(entry[entry.length-3] != "") {
+				amount = Math.round(parseFloat(entry[entry.length-3])*100);
 			}
 			else {
-				amount = Math.round(parseFloat(entry[entry.length-1])*100);
+				amount = Math.round(parseFloat(entry[entry.length-2])*100);
 			}
 			currentBalance += amount;
 	
@@ -442,7 +477,7 @@ function importINGFile(importFile, accountBalance) {
 	
 			var transaction = {
 				"date" : date.getTime(),
-				"description" : entry[2],
+				"description" : entry[1],
 				"amount" : amount
 			}	
 			transactions.push(transaction);
@@ -479,9 +514,9 @@ function combineAllData(data, timePeriod, timeInterval) {
 	var combinedData = {};
 	var currentDate = new Date();
 	currentDate.setHours(0, 0, 0, 0);
-	var endDate = currentDate.getTime() - DAYINMS*timePeriod;
+	var lastDate = currentDate.getTime() - DAYINMS*timePeriod;
 
-	while(currentDate >= endDate) {
+	while(currentDate >= lastDate) {
 		combinedData[currentDate.getTime()] = Math.round(data[0][currentDate.getTime()])
 		for(var i=1; i<data.length; i++) {
 			if(data[i][currentDate.getTime()]) {
@@ -493,7 +528,9 @@ function combineAllData(data, timePeriod, timeInterval) {
 				}
 			}
 		}
-		currentDate = new Date(currentDate - interval);
+		var updatedDates = getNextDates(currentDate, lastDate, interval);
+		currentDate = updatedDates.currentDate;
+		lastDate = updatedDates.lastDate;
 	}
 
 	return combinedData;
@@ -507,35 +544,24 @@ function calculateGraphData(balance, transactions, timePeriod, timeInterval) {
 	var currentDate = new Date();
 	currentDate.setHours(0, 0, 0, 0);
 
-	var endDate = currentDate.getTime() - DAYINMS*timePeriod;
+	var lastDate = currentDate.getTime() - DAYINMS*timePeriod;
 
 	var currentBalance = balance / 100;
 	var data = {}
-
-	//Set current balance for current date
-	data[currentDate.getTime()] = currentBalance;
-
-	//Change current date to the next date
-	currentDate = new Date(currentDate - interval);
-	data[currentDate.getTime()] = currentBalance;
                                                                                                        
 	for(var i=0; i<transactions.length; i++) {
 		var transaction = transactions[i];
 		var transactionDate = new Date(transaction.date);
 
-		if(transactionDate.getTime() <= endDate) {
-			//Fill out all remaining intervals with current balance
-			currentDate = new Date(currentDate - interval);
-			while(currentDate >= endDate) {
-				data[currentDate.getTime()] = currentBalance;
-				currentDate = new Date(currentDate - interval);
-			}
+		if(transactionDate.getTime() <= lastDate) {
 			break;
 		}
 
 		while(transactionDate.getTime() <= currentDate.getTime()) {
-			currentDate = new Date(currentDate - interval);
 			data[currentDate.getTime()] = currentBalance;
+			var updatedDates = getNextDates(currentDate, lastDate, interval);
+			currentDate = updatedDates.currentDate;
+			lastDate = updatedDates.lastDate;
 		}
 	
 		currentBalance -= transaction.amount / 100;
@@ -543,10 +569,28 @@ function calculateGraphData(balance, transactions, timePeriod, timeInterval) {
 	}
 
 	//Fill out all remaining dates with the current balance
-	while(currentDate >= endDate) {
+	while(currentDate >= lastDate) {
 		data[currentDate.getTime()] = currentBalance;
-		currentDate = new Date(currentDate - interval);
+		var updatedDates = getNextDates(currentDate, lastDate, interval);
+		currentDate = updatedDates.currentDate;
+		lastDate = updatedDates.lastDate;
 	}
 
 	return data;
+}
+
+function getNextDates(currentDate, lastDate, interval) {
+	var oldTimeOffset = currentDate.getTimezoneOffset();
+	currentDate = new Date(currentDate - interval); 
+	var newTimeOffset = currentDate.getTimezoneOffset();
+
+	if(oldTimeOffset != newTimeOffset) { //Compenstate for DST
+		currentDate = new Date(currentDate.getTime() + ((newTimeOffset - oldTimeOffset) * 60 * 1000));
+		lastDate = lastDate + ((newTimeOffset - oldTimeOffset) * 60 * 1000);
+	}
+
+	return {
+		"currentDate" : currentDate, 
+		"lastDate": lastDate
+	}
 }

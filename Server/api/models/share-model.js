@@ -7,6 +7,7 @@ var ShareSchema = new Schema ({
 		type: String,
 	},
 	code: {
+		unique: true,
 		type: String,
 	},
 	purchasePrice: {

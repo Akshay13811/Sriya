@@ -1,6 +1,6 @@
 var express = require('express'),
 	app = express(),
-	port = process.env.PORT || 3002,
+	port = process.argv[2] || process.env.PORT || 3002,
 	mongoose = require('mongoose'),
 	Account = require('./api/models/account-model'),
 	Share = require('./api/models/share-model'),
@@ -21,6 +21,9 @@ app.use(fileUpload());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+var portfolioRoutes = require('./api/routes/portfolio-routes');
+portfolioRoutes(app);
 
 var accountRoutes = require('./api/routes/account-routes');
 accountRoutes(app);

@@ -17,9 +17,12 @@ module.exports = function(app) {
 	app.route('/dailyshare/:index/:code')
 		.get(shares.get_daily_share_data)
 
-	app.route('/updatesharehistory')
-		.post(shares.update_history)
+	app.route('/shares/updatesharehistory')
+		.get(shares.update_history)
 
 	app.route('/shares/graph/:graphPeriod/:graphInterval')
 		.get(shares.graph_all_data)
+
+	app.route('/shares/total')
+		.get(shares.get_total)
 }

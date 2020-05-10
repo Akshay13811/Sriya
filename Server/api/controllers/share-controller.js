@@ -15,7 +15,7 @@ const DAYINMS = 86400000;
 /* --- Shares --- */
 
 exports.list_shares = function(req, res) {
-	console.log("*** Listing Shares ***");
+	console.log("*** Shares -  Listing Shares ***");
 	Share.find({}, function(err, shares) {
 		if(err)
 			res.send(err);
@@ -24,7 +24,7 @@ exports.list_shares = function(req, res) {
 }
 
 exports.list_combined_shares = function(req, res) {
-	console.log("*** Listing Shares - Combined ***");
+	console.log("*** Shares - Listing Shares - Combined ***");
 	Share.find({}, function(err, shares) {
 		var shareList = {};
 		for(var i=0; i<shares.length; i++) {
@@ -51,7 +51,7 @@ exports.list_combined_shares = function(req, res) {
 }
 
 exports.create_share = function(req, res) {
-	console.log("*** Creating Share Entry - Index: " + req.body.index + ", Code: " + req.body.code);
+	console.log("*** Shares - Creating Share Entry - Index: " + req.body.index + ", Code: " + req.body.code);
 	var newShare = new Share(req.body);
 	newShare.index = newShare.index.toUpperCase();
 	newShare.code = newShare.code.toUpperCase();
@@ -66,7 +66,7 @@ exports.create_share = function(req, res) {
 }
 
 exports.delete_share = function(req, res) {
-	console.log("*** Deleting share ***")
+	("*** Deleting share ***")
 	Share.deleteOne({
 		_id: req.params.shareId
 	}, function(err, share) {
@@ -77,7 +77,7 @@ exports.delete_share = function(req, res) {
 }
 
 exports.update_share = function(req, res) {
-	console.log("*** Updating share ***")
+	console.log("*** Shares - Updating share ***")
 	Share.findOne({
 		_id: req.params.shareId
 	}, function(err, share) {
@@ -96,62 +96,136 @@ exports.update_share = function(req, res) {
 	})
 }
 
-exports.get_daily_share_data = function(req, res) {
-	console.log("*** Getting Daily Share Data ***")
-	ShareHistory.findOne({
-		index: req.params.index.toUpperCase(),
-		code: req.params.code.toUpperCase()
-	}, function(err, shareHistory) {
-		if(err) {
-			res.send(err);
-			return;
-		}
+exports.get_daily_share_data = async function(req, res) {
+	console.log("*** Getting Daily Share Data for Index: " + req.params.index + ", Code: " + req.params.code + " ***")
 
-		if(!shareHistory) {
-			res.send("Share entry invalid");
-			return;
-		}
+	if(req.params.code.toUpperCase() == "WEB") {
+		res.send("Share entry invalid");
+		return;
+	}
 
-		if(shareHistory.history.length == 0) {
-			res.send("No history");
-			return;
+	const shareHistory = await ShareHistory.aggregate([{ 
+		"$match" : {
+			index: req.params.index.toUpperCase(),
+			code: req.params.code.toUpperCase()
+		},
+		}, 
+		{
+			"$project" : {
+				"current" : { $arrayElemAt: ["$history", 0] },
+				"last" : { $arrayElemAt: ["$history", 1] }
+			}
 		}
+	])
 
-		res.send({
-			currentSharePrice: shareHistory.history[0].close,
-			lastCloseSharePrice: shareHistory.history[1].close
-		})
-	});
+	if(!shareHistory) {
+		res.send("Share entry invalid");
+		return;
+	}
+
+	if(shareHistory.length > 0 && (!shareHistory[0].current || !shareHistory[0].current)) {
+		res.send("Could not retrieve history");
+		return;
+	}
+
+	res.send({
+		currentSharePrice: shareHistory[0].current.close,
+		lastCloseSharePrice: shareHistory[0].last.close
+	})
 }
 
 exports.update_history = function(req, res) {
-	console.log("*** Updating History *** ")
+	console.log("*** Shares - Updating History *** ")
+	var sharesUpdated = [];
 	Share.find({}, function(err, shares) {
 		for(var i=0; i<shares.length; i++) {
-			importShareHistory(shares[i].index, shares[i].code);
+			if(!sharesUpdated.includes(shares[i].index + "." + shares[i].code)) {
+				importShareHistory(shares[i].index, shares[i].code);
+				sharesUpdated.push(shares[i].index + "." + shares[i].code)
+			}
 		}
 	});
-	res.send("Updated History");
+	res.send({status: "Updated History"});
 }
 
-exports.graph_all_data = function(req, res) {
-	Share.find({}, async function(err, shares) {
-		if(err)
-			res.send(err);
+exports.graph_all_data = async function(req, res) {
+	console.log("*** Shares - Getting Graph Data *** ")
+	processGraphData(parseInt(req.params.graphPeriod), parseInt(req.params.graphInterval), res);
+}
 
-		var graphData = {};
-		if(parseInt(req.params.graphInterval) > parseInt(req.params.graphPeriod)) {
-			res.send("Requested interval cannot be larger than period")
+exports.get_total = function(req, res) {
+	Share.find({}, async function(err, shares) {
+		var total = 0;
+		for(var i=0; i<shares.length; i++) {
+			if(!shares[i].soldDate) {
+
+				const shareHistory = await ShareHistory.aggregate([{ 
+						"$match" : {
+							"index" : shares[i].index,
+							"code" : shares[i].code,
+						},
+					}, 
+					{
+						"$project" : {
+							"first" : { $arrayElemAt: ["$history", 0] }
+						}
+					}
+				])
+
+				if(shareHistory.length > 0 && shareHistory[0].first) {
+					total += parseInt(shareHistory[0].first.close * shares[i].numberOfShares * 100);
+				}
+			}
 		}
-		else {
+		res.json({"total" : total})
+	});
+}
+
+exports.get_all_shares_query = getAllSharesQuery
+exports.get_combined_graph_data = getCombinedGraphData
+
+function getAllSharesQuery() {
+	var query = Share.find({});
+	return query;
+}
+
+function processGraphData(period, interval, res) {
+	var graphData = {}; 
+
+	if(interval > period) {
+		res.send({error: "Requested interval cannot be larger than period"})
+		return;
+	}
+
+	Share.find({}).then(async (shares) => {
+			graphData = await getCombinedGraphData(shares, period, interval);
+			if(res) {
+				res.send(graphData);
+			}
+		}
+		, err => {
+			throw new Error("An error occurred when accessing loan data")
+		}
+	);
+
+	return;
+}
+
+async function getCombinedGraphData(shares, period, interval) {
+
+	var promise = () => (
+		new Promise(async (resolve, reject) => {
 			var sharesData = [];
 			for(var i=0; i<shares.length; i++) {
-				sharesData.push(await calculateGraphData(shares[i], parseInt(req.params.graphPeriod), parseInt(req.params.graphInterval)));
+				sharesData.push(await calculateGraphData(shares[i], period, interval));
 			}
-			graphData = combineAllData(sharesData, parseInt(req.params.graphPeriod), parseInt(req.params.graphInterval));
-		}
-		res.json(graphData)
-	});
+
+			var graphData = combineAllData(sharesData, period, interval);
+			resolve(graphData);
+		})
+	)
+	var graphData = await (promise());
+	return graphData;
 }
 
 function combineAllData(data, timePeriod, timeInterval) {
@@ -184,13 +258,13 @@ function combineAllData(data, timePeriod, timeInterval) {
 
 		var updatedDates = getNextDates(currentDate, lastDate, interval);
 		currentDate = updatedDates.currentDate;
-		lastDate = updatedDates.lastDate;	}
+		lastDate = updatedDates.lastDate;	
+	}
 
 	return combinedData;
 }
 
 async function calculateGraphData(share, timePeriod, timeInterval) {
-	console.log("Getting graph data for " + share.index + ":" + share.code)
 
 	//TODO: WEB stock seems to be having issues so will skip it here
 	if(share.code == "WEB") {
@@ -203,12 +277,10 @@ async function calculateGraphData(share, timePeriod, timeInterval) {
 	var currentDate = new Date();
 	currentDate.setHours(0,0,0,0);
 
-	var findingLastClose = false;
 	var lastDate = currentDate.getTime() - DAYINMS*timePeriod;
 
 	var data = {};
-	while(currentDate.getTime() >= lastDate || findingLastClose) {
-
+	while(currentDate.getTime() >= lastDate) {
 		//Check if share holding was held at this date
 		if(currentDate.getTime() < share.purchaseDate) {
 			data[currentDate.getTime()] = 0;
@@ -226,7 +298,7 @@ async function calculateGraphData(share, timePeriod, timeInterval) {
 			lastDate = updatedDates.lastDate;
 			continue;
 		}
-
+		
 		const shareHistory = await ShareHistory.aggregate([
 			{ 
 				"$unwind" : "$history" 
@@ -240,11 +312,7 @@ async function calculateGraphData(share, timePeriod, timeInterval) {
 			}
 		])
 
-		if(!shareHistory[0] && currentDate.getTime() == lastDate) { //No history exists for the last date - continue to search backwards for the next record
-			console.log("finding last close");
-			findingLastClose = true;
-		}
-		else if(!shareHistory[0]) {
+		if(!shareHistory[0]) {
 			//Search for last trading day to get close price
 			var lastTradingDate = new Date(currentDate.getTime() - DAYINMS);
 			var lastTradingDayFound = false;
@@ -261,7 +329,6 @@ async function calculateGraphData(share, timePeriod, timeInterval) {
 						}	 
 					}
 				])
-
 				if(shareHistory[0]) {
 					data[currentDate.getTime()] = parseFloat(share.numberOfShares) * parseFloat(shareHistory[0].history.close);
 					lastTradingDayFound = true;
@@ -270,13 +337,8 @@ async function calculateGraphData(share, timePeriod, timeInterval) {
 				lastTradingDate = getNextDate(lastTradingDate, DAYINMS);
 			}
 		}
-		else if(shareHistory[0] && !findingLastClose) {
+		else if(shareHistory[0]) {
 			data[currentDate.getTime()] = parseFloat(share.numberOfShares) * parseFloat(shareHistory[0].history.close);
-		}
-		else if(shareHistory[0] && findingLastClose) {
-			//Found last close price for last date
-			findingLastClose = false;
-			data[lastDate] = parseFloat(share.numberOfShares) * parseFloat(shareHistory[0].history.close);				
 		}
 
 		var updatedDates = getNextDates(currentDate, lastDate, interval);
@@ -304,7 +366,7 @@ function getNextDates(currentDate, lastDate, interval) {
 	currentDate = new Date(currentDate - interval); 
 	var newTimeOffset = currentDate.getTimezoneOffset();
 
-	if(oldTimeOffset != newTimeOffset) { //Compenstate for DST
+	if(oldTimeOffset !== newTimeOffset) { //Compenstate for DST
 		currentDate = new Date(currentDate.getTime() + ((newTimeOffset - oldTimeOffset) * 60 * 1000));
 		lastDate = lastDate + ((newTimeOffset - oldTimeOffset) * 60 * 1000);
 	}
@@ -317,7 +379,11 @@ function getNextDates(currentDate, lastDate, interval) {
 
 function importShareHistory(index, code) {
 
-	console.log("Importing share history for Index: " + index + " Code: " + code);
+	if(code == "WEB") {
+		return false;
+	}
+
+	console.log("*** Shares - Importing share history for Index: " + index + " Code: " + code + " ***");
 	
 	ShareHistory.findOne({
 		index: index,
@@ -325,23 +391,34 @@ function importShareHistory(index, code) {
 	}, function(err, shareHistory) {
 		if(!shareHistory) {
 			//share does not exist
-			console.log("Share history does not exist");
-			var history = fetchShareHistory(index, code)
+			var lastDate = new Date();
+			lastDate.setYear(lastDate.getFullYear()-5);
+
+			var history = fetchShareHistory(index, code, lastDate)		
 			history.then((data) => {
-				console.log("Updating share history");
-				
-				var shareData = {
-					"index": index,
-					"code": code,
-					"history": data,
-					"lastUpdateDate": new Date()
+				if(!data || data.length == 0) {
+					console.log("*** Shares - Could not retrieve history for Index: " + index + ", Code: " + code + " ***");
+					console.log("*** Shares - Attempt to fetch history again in 60 seconds for Index: " + index + ", Code: " + code + " ***");
+					setTimeout(() => {
+							importShareHistory(index, code);
+					}, 60000);
 				}
-		
-				//Create share history entry
-				var newShareHistory = new ShareHistory(shareData)
-				newShareHistory.save()
-				return true;
+				else {
+					console.log("*** Shares - history does not exist for Index: " + index + ", Code: " + code + " ***");
+					var shareData = {
+						"index": index,
+						"code": code,
+						"history": data,
+						"lastUpdateDate": new Date()
+					}
+					//Create share history entry
+					var newShareHistory = new ShareHistory(shareData)
+					newShareHistory.save()
+					console.log("*** Shares - Added history for Index: " + index + ", Code: " + code + " ***");
+					return true;
+				}
 			})
+				
 		}
 		else {
 			if(shareHistory.history.length > 0) {
@@ -349,29 +426,28 @@ function importShareHistory(index, code) {
 
 				//Only check updates on Mon-Fri
 				if(isUpdateRequired(shareHistory, currentDate)) {
-					var history = fetchShareHistory(index, code, currentDate);
+					var history = fetchShareHistory(index, code, new Date(shareHistory.history[0].date));
 					history.then((data) => {
-						console.log("Updating share history");
-						shareHistory.history = data.concat(shareHistory.history);
-						shareHistory.lastUpdateDate = currentDate;
-						shareHistory.save();
+						if(!data || data.length == 0) {
+							console.log("*** Shares - Could not retrieve history for Index: " + index + ", Code: " + code + " ***");
+							console.log("*** Shares - Attempt to fetch history again in 60 seconds for Index: " + index + ", Code: " + code + " ***");
+							setTimeout(() => {
+								importShareHistory(index, code);
+							}, 60000);
+						}
+						else {
+							console.log("*** Shares - Updating share history for Index: " + index + " Code: " + code + " ***");
+							shareHistory.history = data.concat(shareHistory.history);
+							shareHistory.lastUpdateDate = currentDate;
+							shareHistory.save();
+							console.log("*** Shares - Completed updating share history for Index: " + index + " Code: " + code + " ***");	
+						}
 						return true;
 					})
 				}
 				else {
 					return false;
 				}
-			}
-			else {
-				//No history exists - populate the history
-				var history = fetchShareHistory(index, code)
-				history.then((data) => {
-					console.log("Updating share history");
-					shareHistory.history = data.concat(shareHistory.history);
-					shareHistory.lastUpdateDate = currentDate;
-					shareHistory.save();
-					return true;
-				})
 			}
 		}
 	});
@@ -387,7 +463,7 @@ function isUpdateRequired(shareHistory, currentDate) {
 		
 		//Check that the last update was after 5pm on a Mon-Fri
 		if(lastUpdateDate.getHours() >= 17) {
-			console.log("No update required, last update was today after market closed")
+			console.log("*** Shares - No update required, last update was today after market closed Index: " + shareHistory.index + " Code: " + shareHistory.code)
 			return false;
 		}
 		else {
@@ -429,12 +505,17 @@ function fetchShareHistory(index, code, lastDate) {
 	.then(res => res.json()) //parses output to json
 	.then((data) => {
 		var history = [];
+		console.log(AlphaAdvantageUrl+'function=TIME_SERIES_DAILY&symbol=' + code + '.' + stockIndex + '&outputsize=full&apikey=' + AlphaAdvantageAPIKey);
+		if(!data["Time Series (Daily)"]) {
+			console.log(data);
+			return null;
+		}
 		var keys = Object.keys(data["Time Series (Daily)"]);
 		for(var i=0; i<keys.length; i++) {
 			var date = new Date(keys[i]);
 			date.setHours(0,0,0,0);
 
-			if(lastDate && lastDate <= date) {
+			if(lastDate && date.getTime() <= lastDate.getTime()) {
 				break;
 			}
 

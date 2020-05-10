@@ -3,8 +3,14 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var ValueSchema = new Schema({
-	date: Number,
-	value: Number
+	date: {
+		type: Number,
+		required: 'Please enter the date for this valuation'
+	},
+	value: {
+		type: Number,
+		required: 'Please enter the amount for this valuation'
+	}
 });
 
 var AssetSchema = new Schema({
@@ -17,10 +23,6 @@ var AssetSchema = new Schema({
 		type: String
 	},
 	valuations: [ValueSchema],
-	purchaseDate: {
-		type: Number,
-		required: 'Please enter the date when this asset was purchased/acquired'
-	},
 	soldDate: {
 		type: Number
 	}
