@@ -9,6 +9,9 @@ import ramsIcon from '../../images/rams.jpg';
 //Enums
 import {BankName} from './BankDialog';
 
+//3rd Party Components
+import SimpleBar from 'simplebar-react';
+
 interface IProps {
 	showDialog: boolean;
 	backDialog: (refreshData: boolean) => void;
@@ -24,26 +27,26 @@ export class BankNewSelectionDialog extends React.Component<IProps> {
 	render() {
 		return (
 			<div className={this.props.showDialog ? 'dashboard-menu-dialog fadeIn' : 'dashboard-menu-dialog fadeOut'} onClick={(e) => this.dialogClick(e)}>
-				<div className="dashboard-dialog">
+				<div className="dashboard-dialog bank">
 					<div className="dashboard-dialog-header">
 						Bank Accounts
 					</div>
-					<div className="dashboard-dialog-container">
+					<SimpleBar className="dashboard-dialog-container">
 						<div className='dashboard-bank-form-bank-list'>
 							<div className="dashboard-bank-form-bank-option" onClick={() => this.props.nextDialog(BankName.ING)}>
-								<img src={ingIcon}></img>
+								<img alt="ING" src={ingIcon}></img>
 							</div>
 							<div className="dashboard-bank-form-bank-option" onClick={() => this.props.nextDialog(BankName.UBANK)}>
-								<img src={ubankIcon}></img>
+								<img alt="UBank" src={ubankIcon}></img>
 							</div>
 							<div className="dashboard-bank-form-bank-option" onClick={() => this.props.nextDialog(BankName.COMMBANK)}>
-								<img src={commbankIcon}></img>
+								<img alt="Commonwealth Bank" src={commbankIcon}></img>
 							</div>
 							<div className="dashboard-bank-form-bank-option" onClick={() => this.props.nextDialog(BankName.RAMS)}>
-								<img src={ramsIcon}></img>
+								<img alt="Rams" src={ramsIcon}></img>
 							</div>
 						</div>
-					</div>
+					</SimpleBar>
 					<div className='dashboard-dialog-neutral-button bank-dialog-left-button' onClick={() => this.props.backDialog(false)}>
 						Back
 					</div>

@@ -1,0 +1,82 @@
+@import './variables.scss';
+
+.dashboard-add-share,
+.dashboard-add-share-config-card {
+	box-sizing: border-box;
+	border-radius: 5px;
+	border: 1px dashed mix(white, $dashboard-colour, 10);
+	width: 100%;
+
+	font-size: 12px;
+	text-align: center;
+}
+
+.dashboard-add-share {
+	padding: 5px;
+}
+
+.dashboard-add-share:hover {
+	cursor: pointer;
+}
+
+.dashboard-add-share-config-card {
+	display: grid;
+	grid-template-rows: auto;
+	grid-template-columns: $dashboard-dialog-share-column;
+}
+
+.dashboard-add-share-config-card>div {	
+	font-size: 12px;
+	text-align: center;
+
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.dashboard-share-sold-date>input[type=checkbox],
+.dashboard-share-sold-date>input[type=checkbox] {
+	width: 14px;
+	height: 100%;
+	margin: 0px;
+}
+
+.dashboard-share-sold-date {
+	display: grid;
+	grid-template-columns: 1fr 5fr;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.dashboard-share-config-card {
+	display: grid;
+	grid-template-columns: $dashboard-dialog-share-column;
+
+	font-size: 12px;
+	text-align: center;
+}
+
+.dashboard-share-config-card-dollar-icon,
+.dashboard-share-config-card-tick-icon,
+.dashboard-share-config-card-cross-icon,
+.dashboard-share-config-card-edit-icon,
+.dashboard-share-config-card-delete-icon {
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.dashboard-share-config-card-dollar-icon:hover,
+.dashboard-share-config-card-tick-icon:hover {
+	background-color: $dashboard-button-green-color;
+	cursor: pointer;
+}
+
+.dashboard-share-config-card-edit-icon:hover {
+	background-color: $dashboard-button-color;
+	cursor: pointer;
+}
+
+.dashboard-share-config-card-cross-icon:hover,
+.dashboard-share-config-card-delete-icon:hover {
+	background-color: $dashboard-button-red-color;
+	cursor: pointer;
+}

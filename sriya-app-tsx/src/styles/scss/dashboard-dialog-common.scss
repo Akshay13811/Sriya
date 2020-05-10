@@ -1,0 +1,147 @@
+@import './variables.scss';
+
+.dashboard-menu-dialogs {
+	position: fixed;
+	height: 100%;
+	width: 100%;
+	background-color: rgba(0,0,0,0.8);
+}
+
+.dashboard-menu-dialog {
+	position: fixed;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: $dashboard-dialog-width;
+	height: $dashboard-dialog-height;
+	left: 50%;
+	top: calc((100% - #{$dashboard-dialog-height})/2);
+	margin-left: -$dashboard-dialog-width/2; /* Negative half of width. */
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-bottom: 10px;
+	background-color: $dashboard-colour;
+	border-radius: 5px;
+}
+
+.dashboard-dialog {
+	width: 100%;
+	height: 100%;
+	display: grid;
+	grid-template-rows: $dashboard-dialog-header-height auto;
+	grid-template-columns: repeat(3, 33.33%);
+} 	
+
+.dashboard-dialog-header {
+	grid-column: 1/4;
+	line-height: $dashboard-dialog-header-height;
+	color: rgba(255,255,255,0.8);
+}
+
+.dashboard-dialog-container {
+	overflow-y : auto;
+	grid-column: 1/4;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: rgba(255,255,255,0.5);
+}
+
+.dashboard-summary-table-header-column {
+	background-color: mix(white, $dashboard-colour, 5);
+	font-size: 12px;
+	text-align: center;
+	padding: 5px;
+	color: white;
+}
+
+.dashboard-config-card-date {
+	padding-top: 5px;
+	padding-bottom: 5px;
+	z-index: 100;
+}
+
+.dashboard-dialog-green-button,
+.dashboard-dialog-red-button,
+.dashboard-dialog-neutral-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 5px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.dashboard-dialog-green-button {
+	color: $dashboard-colour;
+	background-color: $dashboard-button-green-color;
+}
+
+.dashboard-dialog-red-button {
+	color: $dashboard-colour;
+	background-color: $dashboard-button-red-color;
+}
+
+.dashboard-dialog-neutral-button {
+	color: $dashboard-colour;
+	background-color: $dashboard-button-color;
+}
+
+.bank-dialog-left-button {
+	grid-column: 1;
+}
+
+.bank-dialog-right-button {
+	grid-column: 3;
+}
+
+.dashboard-dialog-green-button:hover {
+	background-color: #A5D6A7;
+}
+
+.dashboard-share-summary-dialog-table-header {
+	display: grid;
+	grid-template-columns: $dashboard-dialog-share-column;
+	width: 100%;
+}
+
+//----------------------------------------------
+// Custom card properties
+//----------------------------------------------
+.dashboard-config-card-date>div>div>input,
+.dashboard-share-config-card>div>div>div>input,
+.dashboard-add-share-config-card>div>div>div>input {	
+	width: 100%;
+	box-sizing: border-box;
+	background-color: transparent;
+	border: 0px;
+	color: inherit;
+	text-align: center;
+	font-size: 12px;
+}
+
+.dashboard-loan-config-card-item,
+.dashboard-asset-config-card-item,
+.dashboard-share-config-card-item {
+	padding-top: 5px;
+	padding-bottom: 5px;
+	width: 100%;
+	background-color: transparent;
+	border: 0px;
+	color: white;
+	text-align: center;
+}
+
+.dashboard-loan-config-card,
+.dashboard-asset-config-card,
+.dashboard-share-config-card,
+.dashboard-bank-card {
+	background-color: mix(white, $dashboard-colour, 5);
+	border: 1px solid mix(white, $dashboard-colour, 10);
+	border-radius: 5px;
+	width: 100%;
+	box-sizing: border-box;
+
+	display: grid;
+	grid-template-rows: auto;
+}

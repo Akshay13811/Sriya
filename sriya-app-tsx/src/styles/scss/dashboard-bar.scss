@@ -1,0 +1,48 @@
+@import './variables.scss';
+
+.dashboard-menu-button {
+	height: 100%;
+	padding: 10px;
+	box-sizing: border-box;
+	height: $dashboard-bar-width;
+	cursor: pointer;
+}
+
+.dashboard-menu-bar {
+	position: fixed;
+	height: 100%;
+	padding-top: 10px;
+
+	display: grid;
+	grid-template-rows: repeat(5, $dashboard-bar-width);
+	grid-row-gap: 10px;
+	grid-template-columns: repeat(1, 100%);
+
+	width: $dashboard-bar-width;
+	background-color: mix(black, $dashboard-colour, 10);
+}
+
+
+.dashboard-menu-button:hover {
+	background-color: #74B8FF;
+}
+
+.menu-icon:hover {
+	--menu-icon-colour: rgba(0,0,0,0.5);
+}
+
+.bank-icon:hover {
+	--bank-icon-colour: rgba(0,0,0,0.5);
+}
+
+.shares-icon:hover {
+	--shares-icon-colour: rgba(0,0,0,0.5);
+}
+
+.home-icon:hover {
+	--home-icon-colour: rgba(0,0,0,0.5);
+}
+
+.icon>svg>path{ /*target the image with css*/
+	fill: var(--primary-color);
+}

@@ -1,0 +1,58 @@
+@import './variables.scss';
+
+.dashboard-share-card {
+	background-color: rgba(255,255,255,0.1);
+	height: $dashboard-share-card-height;
+	padding-right: 10px;
+	box-sizing: border-box;
+	font-size: 8.5pt;
+	color: white;
+
+	display: grid;
+	grid-template-columns: 2fr 2fr 6fr repeat(3, 3fr);
+	align-items: center;
+	justify-content: center;
+}
+
+.dashboard-share-portfolio-list {
+	display: grid;
+	grid-template-columns: 100%;
+	grid-template-rows: repeat(auto-fill, $dashboard-share-card-height);
+	grid-row-gap: 5px;
+}
+
+.dashboard-share-portfolio-card {
+	display: grid;
+	grid-template-columns: 100%;
+	grid-template-rows: $dashboard-card-header-height + $dashboard-share-portfolio-card-gap calc(100% - #{$dashboard-card-header-height + $dashboard-share-portfolio-card-gap})
+}
+
+.center-text,
+.center-icon {
+	text-align: center;
+}
+
+.right-text {
+	text-align: right;
+}
+
+.left-text {
+	text-align: left;
+}
+
+.double-row {
+	display: grid;
+	grid-template-rows: 50%;
+}
+
+.red-text {
+	color: $dashboard-button-red-color;
+}
+
+.green-text {
+	color: $dashboard-button-green-color;
+}
+
+.neutral-text {
+	color: rgba(255,255,255,0.5);
+}

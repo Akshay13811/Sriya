@@ -6,6 +6,9 @@ import { IAccount } from '../../interfaces/IAccount';
 //Components
 import { BankCard } from './Cards/BankCard';
 
+//3rd Party Components
+import SimpleBar from 'simplebar-react';
+
 interface IProps {
 	showDialog: boolean;
 	hideDialog: () => void;
@@ -23,11 +26,11 @@ export class BankSummaryDialog extends React.Component<IProps> {
 	render() {
 		return (
 			<div className={this.props.showDialog ? 'dashboard-menu-dialog fadeIn' : 'dashboard-menu-dialog fadeOut'} onClick={(e) => this.dialogClick(e)}>
-				<div className="dashboard-dialog">
+				<div className="dashboard-dialog bank">
 					<div className="dashboard-dialog-header">
 						Bank Accounts
 					</div>
-					<div className="dashboard-dialog-container">
+					<SimpleBar className="dashboard-dialog-container">
 						<div className="dashboard-summary-dialog">
 							{this.props.accounts.map(account => (
 								<BankCard
@@ -35,11 +38,11 @@ export class BankSummaryDialog extends React.Component<IProps> {
 									refreshData = {() => this.props.refreshData()}
 								/>
 							))}
-							<div className={this.props.accounts.length == 0 ? 'dashboard-summary-dialog fadeIn' : 'dashboard-summary-dialog fadeOut'}>
+							<div className={this.props.accounts.length === 0 ? 'dashboard-summary-dialog fadeIn' : 'dashboard-summary-dialog fadeOut'}>
 								<p>You do not have any bank accounts</p>	
 							</div>
 						</div>
-					</div>
+					</SimpleBar>
 					<div className='dashboard-dialog-neutral-button bank-dialog-left-button' onClick={() => this.props.hideDialog()}>
 						Back
 					</div>

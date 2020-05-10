@@ -62,7 +62,7 @@ export class Chart extends React.Component<IProps> {
 	getStepSize(numOfSteps: number) {
 		var data = Object.values(this.props.data);
 
-		if(data.length == 0)
+		if(data.length === 0)
 			return null;
 	
 		var min = data[0];
@@ -85,7 +85,7 @@ export class Chart extends React.Component<IProps> {
 			minorRoundedRange = (Math.round(minorRange / magnitude) * magnitude);
 		}
 
-		if(roundedRange == 0) {
+		if(roundedRange === 0) {
 			return 1;
 		}
 		else {
@@ -100,45 +100,47 @@ export class Chart extends React.Component<IProps> {
 
 		var keys = Object.keys(this.props.data);
 
-		if(this.props.configuration == 0) { // 1 Week
-			for(var i=0; i<keys.length; i++) {
-				var date = new Date(parseInt(keys[i]));
+		var i: number;
+		var date: Date;
+		if(this.props.configuration === 0) { // 1 Week
+			for(i=0; i<keys.length; i++) {
+				date = new Date(parseInt(keys[i]));
 				labels.push(days[date.getDay()]);
 			}
 		}
-		else if(this.props.configuration == 1) {
-			for(var i=0; i<keys.length; i++) {
-				var date = new Date(parseInt(keys[i]));
+		else if(this.props.configuration === 1) {
+			for(i=0; i<keys.length; i++) {
+				date = new Date(parseInt(keys[i]));
 				labels.push(date.getDate() + '-' + months[date.getMonth()])
 			}
 		}
-		else if(this.props.configuration == 2) {
-			for(var i=0; i<keys.length; i++) {
-				var date = new Date(parseInt(keys[i]));
+		else if(this.props.configuration === 2) {
+			for(i=0; i<keys.length; i++) {
+				date = new Date(parseInt(keys[i]));
 				labels.push(date.getDate() + '-' + months[date.getMonth()])
 			}
 		}
-		else if(this.props.configuration == 3) {
-			for(var i=0; i<keys.length; i++) {
-				var date = new Date(parseInt(keys[i]));
+		else if(this.props.configuration === 3) {
+			for(i=0; i<keys.length; i++) {
+				date = new Date(parseInt(keys[i]));
 				labels.push(months[date.getMonth()] + '-' + date.getFullYear())
 			}
 		}
-		else if(this.props.configuration == 4) {
-			for(var i=0; i<keys.length; i++) {
-				var date = new Date(parseInt(keys[i]));
+		else if(this.props.configuration === 4) {
+			for(i=0; i<keys.length; i++) {
+				date = new Date(parseInt(keys[i]));
 				labels.push(months[date.getMonth()] + '-' + date.getFullYear())
 			}
 		}
-		else if(this.props.configuration == 5) {
-			for(var i=0; i<keys.length; i++) {
-				var date = new Date(parseInt(keys[i]));
+		else if(this.props.configuration === 5) {
+			for(i=0; i<keys.length; i++) {
+				date = new Date(parseInt(keys[i]));
 				labels.push(months[date.getMonth()] + '-' + date.getFullYear())
 			}
 		}
-		else if(this.props.configuration == 6) {
-			for(var i=0; i<keys.length; i++) {
-				var date = new Date(parseInt(keys[i]));
+		else if(this.props.configuration === 6) {
+			for(i=0; i<keys.length; i++) {
+				date = new Date(parseInt(keys[i]));
 				labels.push(date.getFullYear())
 			}
 		}
@@ -149,9 +151,6 @@ export class Chart extends React.Component<IProps> {
 	render() {
 		var stepSize = this.getStepSize(4);
 		var labels = this.getLabels();
-		console.log(labels);
-		console.log(this.props.data)
-
 		var data = {
 			labels: labels.reverse(),
 			datasets: [{

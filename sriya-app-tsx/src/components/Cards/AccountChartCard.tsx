@@ -12,8 +12,6 @@ import {EndpointUrl} from '../../Configuration';
 
 interface IProps {
 	refreshCard: (refresh: () => void) => void;
-	row: number;
-	column: number;
 }
 
 interface IState {
@@ -59,7 +57,7 @@ export class AccountChartCard extends React.Component<IProps, IState> {
 
 	render() {
 		return (
-			<div className="dashboard-account-card" style={{gridColumn: this.props.column, gridRow: this.props.row}}>
+			<div className="dashboard-card dashboard-chart-card">
 				<div className="dashboard-card-header">{"Cash Total"}</div>
 				<ChartOptions 
 					configuration={this.state.chartConfiguration}

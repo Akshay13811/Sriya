@@ -1,0 +1,19 @@
+.dashboard-loan-summary-dialog-table-header {
+  display: grid;
+  grid-template-columns: 6fr 4fr 4fr 1fr 1fr;
+  width: 100%; }
+
+.dashboard-loan-config-card {
+  display: grid;
+  grid-template-columns: 6fr 4fr 4fr 1fr 1fr;
+  font-size: 12px;
+  text-align: center; }
+
+.dashboard-loan-config-file-upload {
+  grid-column: 2/4; }
+
+.dashboard-loan-config-file-upload > input {
+  box-sizing: border-box;
+  width: 100%;
+  direction: rtl;
+  padding: 10px; }

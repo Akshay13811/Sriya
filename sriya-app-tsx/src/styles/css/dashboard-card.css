@@ -1,0 +1,83 @@
+.dashboard-card {
+  background-color: #353a46;
+  padding: 20px 20px 10px 20px;
+  margin: 5px;
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  flex-flow: column;
+  align-items: stretch; }
+
+.dashboard-card-header {
+  color: white;
+  font-weight: 600;
+  font-size: 18px;
+  height: 25px;
+  flex: 0 1 auto; }
+
+.dashboard-chart-card {
+  display: grid;
+  grid-template-rows: 25px auto;
+  grid-template-columns: 33.33% 66.66%; }
+
+.dashboard-chart {
+  padding-top: 35px;
+  overflow: hidden;
+  flex: 1 1 auto;
+  grid-column-start: 1;
+  grid-column-end: 3; }
+
+.dashboard-chart.canvas {
+  height: 100%; }
+
+.dashboard-chart-options {
+  display: grid;
+  grid-template-rows: 100%;
+  grid-template-columns: 30% 30% 30% 10%;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  color: white;
+  font-size: 9pt; }
+
+.dashboard-chart-option {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; }
+
+.dashboard-chart-option:hover {
+  background-color: rgba(116, 184, 255, 0.5);
+  cursor: pointer; }
+
+.dashboard-chart-dropdown-option:hover {
+  background-color: rgba(116, 184, 255, 0.5);
+  cursor: pointer; }
+
+.dashboard-chart-dropdown {
+  position: absolute;
+  width: 75px;
+  top: 25px;
+  right: 0px;
+  display: grid;
+  grid-template-rows: 25px;
+  grid-template-columns: 100%;
+  background-color: #494e58;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px; }
+
+.dashboard-chart-dropdown-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 25px; }
+
+.select {
+  background-color: rgba(116, 184, 255, 0.5); }
+
+.dashboard-share-portfolio-card {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 40px repeat(auto-fit, 40px);
+  grid-row-gap: 5px; }

@@ -6,6 +6,9 @@ import {EndpointUrl} from '../../Configuration';
 //Enum
 import {BankName} from './BankDialog';
 
+//3rd Party Components
+import SimpleBar from 'simplebar-react';
+
 interface IProps {
 	showDialog: boolean;
 	backDialog: () => void;
@@ -37,7 +40,7 @@ export class BankNewFormDialog extends React.Component<IProps, IState> {
 	}
 
 	createAccount() {
-		if(this.state.accountName == "" || this.state.accountFile == null) {
+		if(this.state.accountName === "" || this.state.accountFile == null) {
 			alert("Please specify account name and/or file");
 			return;
 		}
@@ -47,7 +50,7 @@ export class BankNewFormDialog extends React.Component<IProps, IState> {
 		formData.append("bankName", this.props.bankOption);
 		formData.append("accountName", this.state.accountName);
 
-		if(this.state.accountBalance != -1) {
+		if(this.state.accountBalance !== -1) {
 			formData.append("accountBalance", this.state.accountBalance.toString());
 		}
 
@@ -75,7 +78,7 @@ export class BankNewFormDialog extends React.Component<IProps, IState> {
 	}
 
 	accountBalanceHandler(e: React.ChangeEvent<HTMLInputElement>) {
-		if(e.currentTarget.value == "") {
+		if(e.currentTarget.value === "") {
 			this.setState({
 				accountBalance: -1
 			});
@@ -109,11 +112,11 @@ export class BankNewFormDialog extends React.Component<IProps, IState> {
 	render() {
 		return (
 			<div className={this.props.showDialog ? 'dashboard-menu-dialog fadeIn' : 'dashboard-menu-dialog fadeOut'} onClick={(e) => this.dialogClick(e)}>
-				<div className="dashboard-dialog">
+				<div className="dashboard-dialog bank">
 					<div className="dashboard-dialog-header">
 						Bank Accounts
 					</div>
-					<div className="dashboard-dialog-container">
+					<SimpleBar className="dashboard-dialog-container">
 						<div className='dashboard-bank-form-input'>
 							<label>Account Name</label>
 							<input type="text" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.accountNameHandler(e)}/>
@@ -123,7 +126,7 @@ export class BankNewFormDialog extends React.Component<IProps, IState> {
 							<input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.accountFileHandler(e)}/>
 							<div>{this.state.displayMsg}</div>
 						</div>
-					</div>
+					</SimpleBar>
 					<div className='dashboard-dialog-neutral-button bank-dialog-left-button' onClick={() => this.props.backDialog()}>
 						Back
 					</div>

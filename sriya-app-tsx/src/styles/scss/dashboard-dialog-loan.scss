@@ -1,0 +1,26 @@
+@import './variables.scss';
+
+.dashboard-loan-summary-dialog-table-header {
+	display: grid;
+	grid-template-columns: $dashboard-dialog-loan-column;
+	width: 100%;
+}
+
+.dashboard-loan-config-card {
+	display: grid;
+	grid-template-columns: $dashboard-dialog-loan-column;	
+
+	font-size: 12px;
+	text-align: center;
+}
+
+.dashboard-loan-config-file-upload {
+	grid-column: 2/4;
+}
+
+.dashboard-loan-config-file-upload>input {
+	box-sizing: border-box;
+	width: 100%;
+	direction: rtl;
+	padding: 10px;
+}

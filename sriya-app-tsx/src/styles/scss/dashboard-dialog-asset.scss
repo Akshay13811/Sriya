@@ -1,0 +1,28 @@
+@import './variables.scss';
+
+.dashboard-asset-summary-dialog-table-header {
+	display: grid;
+	grid-template-columns: $dashboard-dialog-asset-column;
+	width: 100%;
+}
+
+.dashboard-asset-config-card {
+	display: grid;
+	grid-template-columns: $dashboard-dialog-asset-column;	
+
+	font-size: 12px;
+	text-align: center;
+}
+
+.dashboard-add-asset-config-card {
+	display: grid;
+	grid-template-rows: auto;
+	grid-template-columns: $dashboard-dialog-asset-column;
+}
+
+.dashboard-asset-valuation-entry {
+	grid-column: 3/8;
+
+	display: grid;
+	grid-template-columns: 3fr 3fr 1fr 1fr 1fr;
+}

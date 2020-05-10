@@ -5,34 +5,36 @@ import {ReactComponent as MenuIcon} from '../images/menu2.svg';
 import {ReactComponent as BankIcon} from '../images/bank2.svg';
 import {ReactComponent as SharesIcon} from '../images/shares2.svg';
 import {ReactComponent as HomeIcon} from '../images/home2.svg';
+import {ReactComponent as WalletIcon} from '../images/wallet2.svg';
 
 //Interfaces
 import {IAccount} from '../interfaces/IAccount';
 import {IShare} from '../interfaces/IShare';
+import {IAsset} from '../interfaces/IAsset';
+import {ILoan} from '../interfaces/ILoan';
 
 //Components
-import {BankDialog, BankName} from '../Components/Dialogs/BankDialog'
+import {BankDialog} from '../Components/Dialogs/BankDialog'
 import {SharesDialog} from './Dialogs/SharesDialog'
-
-//Images
-import ingIcon from '../images/ing.jpg';
-import ubankIcon from '../images/ubank.jpg';
-import commbankIcon from '../images/commbank.png';
-
-//Constants
-import {EndpointUrl} from '../Configuration';
+import {AssetsDialog} from './Dialogs/AssetsDialog'
+import {LoansDialog} from './Dialogs/LoansDialog'
 
 interface IDashboardBarProps {
 	accounts: Array<IAccount>
 	shares: Array<IShare>
+	assets: Array<IAsset>
+	loans: Array<ILoan>
 	refreshAccountData: () => void;
 	refreshShareData: () => void;
+	refreshAssetData: () => void;
+	refreshLoanData: () => void;
 }
 
 interface IDashboardBarState {
 	showBankDialog: boolean;
 	showSharesDialog: boolean;
 	showAssetsDialog: boolean;
+	showLoansDialog: boolean;
 }
 
 export class DashboardBar extends React.Component<IDashboardBarProps, IDashboardBarState> {
@@ -42,28 +44,32 @@ export class DashboardBar extends React.Component<IDashboardBarProps, IDashboard
 		this.state = {
 			showBankDialog: false,
 			showSharesDialog: false,
-			showAssetsDialog: false
+			showAssetsDialog: false,
+			showLoansDialog: false
 		}
 	}
 
 	openBankDialog() {
-		var newBankDialog = this.state.showBankDialog ? false : true;
 		this.setState({
-			showBankDialog: newBankDialog
+			showBankDialog: !this.state.showBankDialog
 		})
 	}
 
 	openSharesDialog() {
-		var newSharesDialog = this.state.showSharesDialog ? false : true;
 		this.setState({
-			showSharesDialog: newSharesDialog
+			showSharesDialog: !this.state.showSharesDialog
 		})
 	}
 
 	openAssetsDialog() {
-		var newAssetsDialog = this.state.showAssetsDialog ? false : true;
 		this.setState({
-			showAssetsDialog: newAssetsDialog
+			showAssetsDialog: !this.state.showAssetsDialog
+		})
+	}
+
+	openLoansDialog() {
+		this.setState({
+			showLoansDialog: !this.state.showLoansDialog
 		})
 	}
 
@@ -71,12 +77,13 @@ export class DashboardBar extends React.Component<IDashboardBarProps, IDashboard
 		this.setState({
 			showBankDialog: false,
 			showSharesDialog: false,
-			showAssetsDialog: false
+			showAssetsDialog: false,
+			showLoansDialog: false
 		})		
 	}
 
 	showDialog() {
-		return this.state.showBankDialog || this.state.showSharesDialog || this.state.showAssetsDialog;
+		return this.state.showBankDialog || this.state.showSharesDialog || this.state.showAssetsDialog || this.state.showLoansDialog;
 	}
 
 	hideBankDialog() {
@@ -91,6 +98,18 @@ export class DashboardBar extends React.Component<IDashboardBarProps, IDashboard
 		})	
 	}
 
+	hideAssetsDialog() {
+		this.setState({
+			showAssetsDialog: false
+		})
+	}
+
+	hideLoansDialog() {
+		this.setState({
+			showLoansDialog: false
+		})
+	}
+
 	dialogClick(e: React.MouseEvent) {
 		e.stopPropagation();
 	}
@@ -103,13 +122,16 @@ export class DashboardBar extends React.Component<IDashboardBarProps, IDashboard
 						<MenuIcon />
 					</div>
 					<div className="dashboard-menu-button bank-icon" onClick={() => this.openBankDialog()}>
-						<BankIcon />
+						<WalletIcon />
 					</div>
 					<div className="dashboard-menu-button shares-icon" onClick={() => this.openSharesDialog()}>
 						<SharesIcon />
 					</div>
 					<div className="dashboard-menu-button home-icon" onClick={() => this.openAssetsDialog()}>
 						<HomeIcon />
+					</div>
+					<div className="dashboard-menu-button home-icon" onClick={() => this.openLoansDialog()}>
+						<BankIcon />
 					</div>
 				</div>
 
@@ -125,6 +147,20 @@ export class DashboardBar extends React.Component<IDashboardBarProps, IDashboard
 					hideDialogCallback = {() => this.hideSharesDialog()}
 					shares = {this.props.shares}
 					refreshShareData = {() => this.props.refreshShareData()}					
+				/>
+
+				<AssetsDialog
+					showDialog = {this.state.showAssetsDialog}
+					hideDialogCallback = {() => this.hideAssetsDialog()}
+					assets = {this.props.assets}
+					refreshAssetData = {() => this.props.refreshAssetData()}						
+				/>
+
+				<LoansDialog
+					showDialog = {this.state.showLoansDialog}
+					hideDialogCallback = {() => this.hideLoansDialog()}
+					loans = {this.props.loans}
+					refreshLoanData = {() => this.props.refreshLoanData()}
 				/>
 			</div>
 		);

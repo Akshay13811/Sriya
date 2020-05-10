@@ -1,11 +1,11 @@
 import React from 'react';
 
 //Interfaces
-import { IShare } from '../../interfaces/IShare';
+import { IAsset } from '../../interfaces/IAsset';
 
 //Components
-import { ShareConfigCard } from './Cards/ShareConfigCard';
-import { AddShareConfigCard } from './Cards/AddShareConfigCard';
+import { AssetConfigCard } from './Cards/AssetConfigCard';
+import { AddAssetConfigCard } from './Cards/AddAssetConfigCard';
 
 //3rd Party Components
 import SimpleBar from 'simplebar-react';
@@ -15,10 +15,10 @@ interface IProps {
 	hideDialog: () => void;
 	nextDialog: () => void;
 	refreshData: () => void;
-	shares: Array<IShare>;
+	assets: Array<IAsset>;
 }
 
-export class ShareSummaryDialog extends React.Component<IProps> {
+export class AssetSummaryDialog extends React.Component<IProps> {
 
 	dialogClick(e: React.MouseEvent) {
 		e.stopPropagation();
@@ -29,45 +29,40 @@ export class ShareSummaryDialog extends React.Component<IProps> {
 			<div className={this.props.showDialog ? 'dashboard-menu-dialog fadeIn' : 'dashboard-menu-dialog fadeOut'} onClick={(e) => this.dialogClick(e)}>
 				<div className="dashboard-dialog">
 					<div className="dashboard-dialog-header">
-						Shares
+						Assets
 					</div>
 					<SimpleBar className="dashboard-dialog-container">
 						<div className="dashboard-summary-dialog">
-							<div className="dashboard-share-summary-dialog-table-header">
+							<div className="dashboard-asset-summary-dialog-table-header">
 								<div className="dashboard-summary-table-header-column">
-									Index
+									Name
 								</div>
 								<div className="dashboard-summary-table-header-column">
-									Code
+									Description
 								</div>
 								<div className="dashboard-summary-table-header-column">
-									Purchase Date
+									Valuations
 								</div>
 								<div className="dashboard-summary-table-header-column">
-									Sold Date
 								</div>
 								<div className="dashboard-summary-table-header-column">
-									Available Units
-								</div>
-								<div className="dashboard-summary-table-header-column">
-									Purchase Price
-								</div>
+								</div>	
 								<div className="dashboard-summary-table-header-column">
 								</div>	
 								<div className="dashboard-summary-table-header-column">
 								</div>	
 							</div>
-							{this.props.shares.map(share => (
-								<ShareConfigCard
-									share = {share}
+							{this.props.assets.map(asset => (
+								<AssetConfigCard
+									asset = {asset}
 									refreshData = {() => this.props.refreshData()}
 								/>
 							))}
-							<AddShareConfigCard
+							<AddAssetConfigCard
 								refreshData = {() => this.props.refreshData()}
 							/>
-							<div className={this.props.shares.length === 0 ? 'dashboard-summary-dialog fadeIn' : 'dashboard-summary-dialog fadeOut'}>
-								<p>You do not have any share accounts</p>	
+							<div className={this.props.assets.length === 0 ? 'dashboard-summary-dialog fadeIn' : 'dashboard-summary-dialog fadeOut'}>
+								<p>You do not have any assets</p>	
 							</div>
 						</div>
 					</SimpleBar>

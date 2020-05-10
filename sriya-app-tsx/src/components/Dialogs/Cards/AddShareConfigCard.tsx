@@ -9,9 +9,6 @@ import {ReactComponent as AddIcon} from '../../../images/add.svg';
 import {ReactComponent as TickIcon} from '../../../images/tick.svg';
 import {ReactComponent as CrossIcon} from '../../../images/cross.svg';
 
-//Interfaces
-import {IShare} from '../../../interfaces/IShare';
-
 //Constants
 import {EndpointUrl} from '../../../Configuration';
 
@@ -102,11 +99,11 @@ export class AddShareConfigCard extends React.Component<IProps, IState> {
 	}
 
 	handleAddShare = () => {
-		if(this.state.index == "") {
+		if(this.state.index === "") {
 			alert("Index is invalid");
 			return;
 		}
-		else if(this.state.code == "") {
+		else if(this.state.code === "") {
 			alert("Code is invalid");
 			return;
 		}
@@ -118,11 +115,11 @@ export class AddShareConfigCard extends React.Component<IProps, IState> {
 			alert("Sold date is invalid");
 			return;
 		}
-		else if(isNaN(this.state.units) || this.state.units == 0) {
+		else if(isNaN(this.state.units) || this.state.units === 0) {
 			alert("Available units is invalid");
 			return;
 		}
-		else if(isNaN(this.state.price) || this.state.price == 0) {
+		else if(isNaN(this.state.price) || this.state.price === 0) {
 			alert("Purchase price is invalid")
 			return;
 		}
@@ -143,7 +140,6 @@ export class AddShareConfigCard extends React.Component<IProps, IState> {
 		})
 		.then(response => response.json())
 		.then((data) => {
-			console.log(data);
 			this.props.refreshData();
 		})
 
@@ -186,7 +182,7 @@ export class AddShareConfigCard extends React.Component<IProps, IState> {
 					<div className='dashboard-add-share-config-card'>
 						<div contentEditable={true} placeholder="Index" onInput={this.handleIndexChange}>ASX</div>
 						<div contentEditable={true} placeholder="Code" onInput={this.handleCodeChange}></div>
-						<div className="dashboard-share-purchase-date">
+						<div className="dashboard-config-card-date">
 							<DatePicker
 								selected={this.state.purchaseDate}
 								onChange={this.handlePurchaseChange}

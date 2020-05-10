@@ -1,7 +1,7 @@
 import React from 'react';
 
 //Constants
-import { EndpointUrl, AlphaAdvantageUrl, AlphaAdvantageAPIKey } from '../../Configuration';
+import { EndpointUrl } from '../../Configuration';
 
 //Interfaces
 import { IShare } from '../../interfaces/IShare';
@@ -58,7 +58,7 @@ export class ShareCard extends React.Component<IProps, IState> {
 		return (
 			<div className="center-icon">
 				{ change > 0 ? <ShareUp />
-				: change == 0 ? <ShareNeutral />
+				: change === 0 ? <ShareNeutral />
 				: <ShareDown />
 				}
 			</div>
@@ -67,13 +67,12 @@ export class ShareCard extends React.Component<IProps, IState> {
 
 	render() {
 		var code = this.props.share.code.toUpperCase();
-		var purchaseValue = this.props.share.purchasePrice * this.props.share.numberOfShares
 		var currentValue = 0;
 
 		var overallTextColour = "right-text neutral-text";
 		var overallDifference = 0;
 		var overallPercentage = 0;
-		if(this.state.currentSharePrice !=0) {
+		if(this.state.currentSharePrice !== 0) {
 			var purchaseValue = this.props.share.purchasePrice * this.props.share.numberOfShares
 			currentValue = this.state.currentSharePrice * this.props.share.numberOfShares;	
 			overallDifference = currentValue - purchaseValue;
@@ -90,7 +89,7 @@ export class ShareCard extends React.Component<IProps, IState> {
 		var dailyTextColour = "right-text neutral-text";
 		var dailyDifference = 0;
 		var dailyPercentage = 0;
-		if(this.state.lastCloseSharePrice !=0) {
+		if(this.state.lastCloseSharePrice !== 0) {
 			var previousValue = this.state.lastCloseSharePrice * this.props.share.numberOfShares;
 			dailyDifference = currentValue - previousValue;
 			dailyPercentage = dailyDifference / previousValue * 100;

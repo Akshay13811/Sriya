@@ -1,0 +1,45 @@
+.dashboard-share-card {
+  background-color: rgba(255, 255, 255, 0.1);
+  height: 40px;
+  padding-right: 10px;
+  box-sizing: border-box;
+  font-size: 8.5pt;
+  color: white;
+  display: grid;
+  grid-template-columns: 2fr 2fr 6fr repeat(3, 3fr);
+  align-items: center;
+  justify-content: center; }
+
+.dashboard-share-portfolio-list {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: repeat(auto-fill, 40px);
+  grid-row-gap: 5px; }
+
+.dashboard-share-portfolio-card {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 40px calc(100% - 40px); }
+
+.center-text,
+.center-icon {
+  text-align: center; }
+
+.right-text {
+  text-align: right; }
+
+.left-text {
+  text-align: left; }
+
+.double-row {
+  display: grid;
+  grid-template-rows: 50%; }
+
+.red-text {
+  color: #ef5350; }
+
+.green-text {
+  color: #81C784; }
+
+.neutral-text {
+  color: rgba(255, 255, 255, 0.5); }

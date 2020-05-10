@@ -1,0 +1,85 @@
+.dashboard-menu-dialogs {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.8); }
+
+.dashboard-menu-dialog {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 620px;
+  height: 500px;
+  left: 50%;
+  top: calc((100% - 500px)/2);
+  margin-left: -310px;
+  /* Negative half of width. */
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+  background-color: #2A303C;
+  border-radius: 5px; }
+
+.dashboard-dialog {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 40px 420px 40px;
+  grid-template-columns: repeat(3, 33.33%); }
+
+.dashboard-dialog-header {
+  grid-column: 1/4;
+  line-height: 40px;
+  color: rgba(255, 255, 255, 0.8); }
+
+.dashboard-dialog-container {
+  overflow-y: auto;
+  grid-column: 1/4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.5); }
+
+.dashboard-summary-table-header-column {
+  background-color: #353a46;
+  font-size: 12px;
+  text-align: center;
+  padding: 5px;
+  color: white; }
+
+.dashboard-dialog-green-button,
+.dashboard-dialog-red-button,
+.dashboard-dialog-neutral-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer; }
+
+.dashboard-dialog-green-button {
+  color: #2A303C;
+  background-color: #81C784; }
+
+.dashboard-dialog-red-button {
+  color: #2A303C;
+  background-color: #ef5350; }
+
+.dashboard-dialog-neutral-button {
+  color: #2A303C;
+  background-color: #90CAF9; }
+
+.bank-dialog-left-button {
+  grid-column: 1; }
+
+.bank-dialog-right-button {
+  grid-column: 3; }
+
+.dashboard-dialog-green-button:hover {
+  background-color: #A5D6A7; }
+
+.dashboard-share-summary-dialog-table-header {
+  display: grid;
+  grid-template-columns: 2fr 2fr 4fr 4fr 3fr 3fr 1fr 1fr;
+  width: 100%; }

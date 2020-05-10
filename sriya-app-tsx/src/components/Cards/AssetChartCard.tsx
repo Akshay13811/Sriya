@@ -19,7 +19,7 @@ interface IState {
 	chartConfiguration: number;
 }
 
-export class LoanChartCard extends React.Component<IProps, IState> {
+export class AssetChartCard extends React.Component<IProps, IState> {
 	
 	constructor(props: IProps) {
 		super(props);
@@ -30,19 +30,16 @@ export class LoanChartCard extends React.Component<IProps, IState> {
 	}
 
 	componentDidMount() {
-		this.fetchLoanGraphData();
-		this.props.refreshCard(this.fetchLoanGraphData.bind(this));
+		this.fetchAssetGraphData();
+		this.props.refreshCard(this.fetchAssetGraphData.bind(this));
 	 }
 	
-	fetchLoanGraphData() {
-		console.log("Fetching loan data");
+	 fetchAssetGraphData() {
 		var period = ChartConfigurations[this.state.chartConfiguration].period;
 		var interval = ChartConfigurations[this.state.chartConfiguration].interval;
-		fetch(EndpointUrl+'/loans/graph/'+period+'/'+interval, {mode: 'cors'})
+		fetch(EndpointUrl+'/assets/graph/'+period+'/'+interval, {mode: 'cors'})
 		.then(res => res.json()) //parses output to json
 		.then((data) => {
-			console.log("Got data");
-			console.log(data);
 			this.setState({
 				data: data
 			})
@@ -54,7 +51,7 @@ export class LoanChartCard extends React.Component<IProps, IState> {
 		this.setState({
 			chartConfiguration: configuration
 		}, () => {
-			this.fetchLoanGraphData();
+			this.fetchAssetGraphData();
 		})
 	}
 

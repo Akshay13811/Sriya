@@ -1,6 +1,9 @@
 import React from 'react';
 
 //Components
+import { PortfolioChartCard } from './Cards/PortfolioChartCard'
+import { PortfolioBreakdownCard } from './Cards/PortfolioBreakdownCard'
+import { AssetChartCard } from './Cards/AssetChartCard';
 import { AccountChartCard } from './Cards/AccountChartCard';
 import { LoanChartCard } from './Cards/LoanChartCard'
 import { SharePortfolioCard } from './Cards/SharePortfolioCard';
@@ -13,15 +16,21 @@ import { EndpointUrl } from '../Configuration';
 //Interfaces
 import { IAccount } from '../interfaces/IAccount';
 import { IShare } from '../interfaces/IShare';
+import { IAsset } from '../interfaces/IAsset';
+import { ILoan } from '../interfaces/ILoan';
 
 interface IProps {}
 interface IState {
 	accounts: Array<IAccount>;
 	shares: Array<IShare>;
+	assets: Array<IAsset>;
+	loans: Array<ILoan>;
 	sharesCombined: Array<IShare>;
 	refreshAccountCard: () => void;
 	refreshShareCard: () => void;
 	refreshLoanCard: () => void;
+	refreshAssetCard: () => void;
+	refreshPortfolioCard: () => void;
 }
 
 export class Dashboard extends React.Component<IProps, IState> {
@@ -31,15 +40,35 @@ export class Dashboard extends React.Component<IProps, IState> {
 		this.state = {
 			accounts: [],
 			shares: [],
+			assets: [],
+			loans: [],
 			sharesCombined: [],
 			refreshAccountCard: () => {},
 			refreshShareCard: () => {},
-			refreshLoanCard: () => {}
+			refreshLoanCard: () => {},
+			refreshAssetCard: () => {},
+			refreshPortfolioCard: () => {}
 		}
 	}
 
 	componentDidMount() {
+		this.updatesharehistory();
 		this.fetchAccountData();
+		this.fetchShareData();
+		this.fetchAssetData();
+		this.fetchLoanData();
+	}
+
+	updatesharehistory() {
+		fetch(EndpointUrl+'/shares/updatesharehistory', {mode: 'cors'})
+		.then(res => res.json()) //parses output to json
+		.then((data) => {
+			if(data.status === "Updated History"){
+				//TODO: updated successfully - send notification
+			}
+		})
+		.catch(console.log)
+
 		this.fetchShareData();
 	}
 
@@ -54,6 +83,7 @@ export class Dashboard extends React.Component<IProps, IState> {
 		.catch(console.log)
 
 		this.state.refreshAccountCard();
+		this.state.refreshPortfolioCard();
 	}
 
 	fetchShareData() {
@@ -76,44 +106,89 @@ export class Dashboard extends React.Component<IProps, IState> {
 		.catch(console.log)
 
 		this.state.refreshShareCard();
+		this.state.refreshPortfolioCard();
 	}
 
-	renderAccountCard(row: number, column: number) {
+	fetchAssetData() {
+		fetch(EndpointUrl+'/assets', {mode: 'cors'})
+		.then(res => res.json()) //parses output to json
+		.then((data) => {
+			this.setState({
+				assets: data
+			})
+		})
+		.catch(console.log)
+
+		this.state.refreshAssetCard();
+		this.state.refreshPortfolioCard();
+	}
+
+	fetchLoanData() {
+		fetch(EndpointUrl+'/loans', {mode: 'cors'})
+		.then(res => res.json()) //parses output to json
+		.then((data) => {
+			this.setState({
+				loans: data
+			})
+		})
+		.catch(console.log)
+
+		this.state.refreshAssetCard();
+		this.state.refreshPortfolioCard();
+	}
+
+	renderAccountCard() {
 		return (
 			<AccountChartCard
 				refreshCard={(callable: () => void) => this.setState({refreshAccountCard: callable})}
-				row = {row}
-				column = {column}
 			/>
 		)
 	}
 
-	renderSharePortfolioCard(row: number, column: number) {
+	renderSharePortfolioCard() {
 		return (
 			<SharePortfolioCard
 				shares = {this.state.sharesCombined}
-				row = {row}
-				column = {column}
 			/>
 		)
 	}
 
-	renderShareChartCard(row: number, column: number) {
+	renderShareChartCard() {
 		return (
 			<ShareChartCard
 				refreshCard={(callable: () => void) => this.setState({refreshShareCard: callable})}
-				row = {row}
-				column = {column}
 			/>
 		)
 	}
 
-	renderLoanChartCard(row: number, column: number) {
+	renderLoanChartCard() {
 		return (
 			<LoanChartCard
 				refreshCard={(callable: () => void) => this.setState({refreshLoanCard: callable})}
-				row = {row}
-				column = {column}
+			/>
+		)
+	}
+
+	renderAssetChartCard() {
+		return (
+			<AssetChartCard
+				refreshCard={(callable: () => void) => this.setState({refreshAssetCard: callable})}
+			/>
+		)
+	}
+
+	renderPortfolioBreakdownCard() {
+		return (
+			<PortfolioBreakdownCard
+				refreshCard={(callable: () => void) => this.setState({refreshPortfolioCard: callable})}
+			/>
+		)
+	}
+
+	renderPortfolioChartCard() {
+		return (
+			<PortfolioChartCard
+				refreshCard={(callable: () => void) => this.setState({refreshPortfolioCard: callable})}
 			/>
 		)
 	}
@@ -123,8 +198,12 @@ export class Dashboard extends React.Component<IProps, IState> {
 			<DashboardBar
 				accounts={this.state.accounts}
 				shares={this.state.shares}
+				assets={this.state.assets}
+				loans={this.state.loans}
 				refreshAccountData={() => this.fetchAccountData()}
 				refreshShareData={() => this.fetchShareData()}
+				refreshAssetData={() => this.fetchAssetData()}
+				refreshLoanData={() => this.fetchLoanData()}
 			/>
 		)
 	}
@@ -136,10 +215,12 @@ export class Dashboard extends React.Component<IProps, IState> {
 					{this.renderBar()}
 				</div>
 				<div className="dashboard-main-container">
-					{this.renderAccountCard(2,1)}
-					{this.renderSharePortfolioCard(2,3)}
-					{this.renderLoanChartCard(2,2)}
-					{this.renderShareChartCard(1,3)}
+					{this.renderPortfolioChartCard()}
+					{this.renderPortfolioBreakdownCard()}
+					{this.renderShareChartCard()}
+					{this.renderAccountCard()}
+					{this.renderLoanChartCard()}
+					{this.renderSharePortfolioCard()}
 				</div>
 			</div>
 		)

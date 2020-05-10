@@ -117,11 +117,11 @@ export class ShareConfigCard extends React.Component<IProps, IState> {
 	}
 
 	handleUpdateShare = () => {
-		if(this.state.index == "") {
+		if(this.state.index === "") {
 			alert("Index is invalid");
 			return;
 		}
-		else if(this.state.code == "") {
+		else if(this.state.code === "") {
 			alert("Code is invalid");
 			return;
 		}
@@ -133,11 +133,11 @@ export class ShareConfigCard extends React.Component<IProps, IState> {
 			alert("Sold date is invalid");
 			return;
 		}
-		else if(isNaN(this.state.units) || this.state.units == 0) {
+		else if(isNaN(this.state.units) || this.state.units === 0) {
 			alert("Available units is invalid");
 			return;
 		}
-		else if(isNaN(this.state.price) || this.state.price == 0) {
+		else if(isNaN(this.state.price) || this.state.price === 0) {
 			alert("Purchase price is invalid")
 			return;
 		}
@@ -158,13 +158,11 @@ export class ShareConfigCard extends React.Component<IProps, IState> {
 		})
 		.then(response => response.json())
 		.then((data) => {
-			console.log(data);
 			if(data.success) {
 				this.props.refreshData();
 			}
 			else {
 				//Revert states back to the prop values
-				console.log("reverting values");
 				this.setState({
 					index: this.props.share.index,
 					code: this.props.share.code,
@@ -187,7 +185,7 @@ export class ShareConfigCard extends React.Component<IProps, IState> {
 			<div className="dashboard-share-config-card">
 				<div contentEditable={this.state.editMode} className="dashboard-share-config-card-item" onInput={this.handleIndexChange}>{this.state.index}</div>
 				<div contentEditable={this.state.editMode} className="dashboard-share-config-card-item" onInput={this.handleCodeChange}>{this.state.code}</div>
-				<div className="dashboard-share-purchase-date">
+				<div className="dashboard-config-card-date">
 					<DatePicker
 						selected={this.state.purchaseDate}
 						onChange={this.handlePurchaseChange}
