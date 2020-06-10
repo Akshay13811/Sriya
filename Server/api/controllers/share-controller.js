@@ -8,7 +8,8 @@ const fetch = require("node-fetch");
 
 const AlphaAdvantageUrl = 'https://www.alphavantage.co/query?';
 const AlphaAdvantageAPIKey = 'MEFRXCIZH7KIKI26';
-const DemoKey = 'demo';
+
+const RapidApiKey = '7ebe78ee49msh055d582bb72c610p1db410jsnd866d6904ae0';
 
 const DAYINMS = 86400000;
 
@@ -62,7 +63,7 @@ exports.create_share = function(req, res) {
 		res.json(share);
 	});
 
-	importShareHistory(req.body.index, req.body.code);
+	importShareHistory_YahooFin(req.body.index, req.body.code);
 }
 
 exports.delete_share = function(req, res) {
@@ -98,12 +99,7 @@ exports.update_share = function(req, res) {
 
 exports.get_daily_share_data = async function(req, res) {
 	console.log("*** Getting Daily Share Data for Index: " + req.params.index + ", Code: " + req.params.code + " ***")
-
-	if(req.params.code.toUpperCase() == "WEB") {
-		res.send("Share entry invalid");
-		return;
-	}
-
+	
 	const shareHistory = await ShareHistory.aggregate([{ 
 		"$match" : {
 			index: req.params.index.toUpperCase(),
@@ -140,7 +136,7 @@ exports.update_history = function(req, res) {
 	Share.find({}, function(err, shares) {
 		for(var i=0; i<shares.length; i++) {
 			if(!sharesUpdated.includes(shares[i].index + "." + shares[i].code)) {
-				importShareHistory(shares[i].index, shares[i].code);
+				importShareHistory_YahooFin(shares[i].index, shares[i].code);
 				sharesUpdated.push(shares[i].index + "." + shares[i].code)
 			}
 		}
@@ -266,11 +262,6 @@ function combineAllData(data, timePeriod, timeInterval) {
 
 async function calculateGraphData(share, timePeriod, timeInterval) {
 
-	//TODO: WEB stock seems to be having issues so will skip it here
-	if(share.code == "WEB") {
-		return {};
-	}
-
 	var interval = DAYINMS*timeInterval;
 
 	//Get current data
@@ -377,7 +368,107 @@ function getNextDates(currentDate, lastDate, interval) {
 	}
 }
 
-function importShareHistory(index, code) {
+function importShareHistory_YahooFin(index, code) {
+	ShareHistory.findOne({
+		index: index,
+		code: code
+	}, function(err, shareHistory) {
+		if(!shareHistory) {
+			var lastDate = new Date();
+			lastDate.setYear(lastDate.getFullYear()-5);
+
+			var history = fetchShareHistory_YahooFin(index, code, lastDate);
+			history.then((data) => {
+				var shareData = {
+					"index": index,
+					"code": code,
+					"history": data,
+					"lastUpdateDate": new Date()
+				}
+				//Create share history entry
+				var newShareHistory = new ShareHistory(shareData)
+				newShareHistory.save()
+				console.log("*** Shares - Added history for Index: " + index + ", Code: " + code + " ***");
+				return true;
+			});
+		}
+		else {
+			if(shareHistory.history.length > 0) {
+				var currentDate = new Date();
+
+				//Only check updates on Mon-Fri
+				if(isUpdateRequired(shareHistory, currentDate)) {
+					var history = fetchShareHistory_YahooFin(index, code, new Date(shareHistory.history[0].date));
+					history.then((data) => {
+						shareHistory.history = data.concat(shareHistory.history);
+						shareHistory.lastUpdateDate = currentDate;
+						shareHistory.save();
+						console.log("*** Shares - Completed updating share history for Index: " + index + " Code: " + code + " ***");	
+						return true;
+					})
+				}
+				else {
+					return false;
+				}
+			}
+		}
+	});
+}
+
+
+function fetchShareHistory_YahooFin(index, code, lastDate) {
+	var stockIndex = index;
+	if(index.toUpperCase() == "ASX") {
+		stockIndex = "AX";
+	}
+
+	//Start date
+	var date = new Date();
+	if(date.getHours < 16 || (date.getHours == 16 && date.getMinutes < 30)) {
+		date.setHours(0,0,0,0);
+	}
+
+	console.log(`https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-historical-data?frequency=1d&filter=history&period1=${Math.round(lastDate.getTime()/1000)}&period2=${Math.round(date.getTime()/1000)}&symbol=${code}.${stockIndex}`);
+
+	return fetch(`https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-historical-data?frequency=1d&filter=history&period1=${Math.round(lastDate.getTime()/1000)}&period2=${Math.round(date.getTime()/1000)}&symbol=${code}.${stockIndex}`, {
+		"method": "GET",
+		"headers": {
+			"x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
+			"x-rapidapi-key": RapidApiKey
+		}
+	})
+	.then(res => res.json()) 
+	.then((data) => {
+		var history = [];
+		for(var i=0; i<data.prices.length; i++) {
+			var date = new Date(data.prices[i].date * 1000);
+			date.setHours(0,0,0,0);
+
+			if(lastDate && date.getTime() <= lastDate.getTime()) {
+				break;
+			}
+			
+			console.log(code + " | Adding share data for: " + date);
+
+			var dailyShareData = {
+				"date" : date.getTime(),
+				"open" : data.prices[i].open,
+				"close" : data.prices[i].close,
+				"high" : data.prices[i].high,
+				"low" : data.prices[i].low,
+			}
+
+			history.push(dailyShareData);
+		}
+		return history;
+	})
+	.catch(err => {
+		console.log(err);
+	});
+}
+
+//Obsolete
+function importShareHistory_AlphaAdvantage(index, code) {
 
 	if(code == "WEB") {
 		return false;
@@ -394,7 +485,7 @@ function importShareHistory(index, code) {
 			var lastDate = new Date();
 			lastDate.setYear(lastDate.getFullYear()-5);
 
-			var history = fetchShareHistory(index, code, lastDate)		
+			var history = fetchShareHistory_AlphaAdvantage(index, code, lastDate)		
 			history.then((data) => {
 				if(!data || data.length == 0) {
 					console.log("*** Shares - Could not retrieve history for Index: " + index + ", Code: " + code + " ***");
@@ -426,7 +517,7 @@ function importShareHistory(index, code) {
 
 				//Only check updates on Mon-Fri
 				if(isUpdateRequired(shareHistory, currentDate)) {
-					var history = fetchShareHistory(index, code, new Date(shareHistory.history[0].date));
+					var history = fetchShareHistory_AlphaAdvantage(index, code, new Date(shareHistory.history[0].date));
 					history.then((data) => {
 						if(!data || data.length == 0) {
 							console.log("*** Shares - Could not retrieve history for Index: " + index + ", Code: " + code + " ***");
@@ -461,8 +552,8 @@ function isUpdateRequired(shareHistory, currentDate) {
 		lastUpdateDate.getMonth() == currentDate.getMonth() &&
 		lastUpdateDate.getFullYear() == currentDate.getFullYear()) {
 		
-		//Check that the last update was after 5pm on a Mon-Fri
-		if(lastUpdateDate.getHours() >= 17) {
+		//Check that the last update was after 4:30pm today
+		if(lastUpdateDate.getHours() > 16 || (lastUpdateDate.getHours() == 16 && lastUpdateDate.getMinutes() >= 30)) {
 			console.log("*** Shares - No update required, last update was today after market closed Index: " + shareHistory.index + " Code: " + shareHistory.code)
 			return false;
 		}
@@ -477,6 +568,16 @@ function isUpdateRequired(shareHistory, currentDate) {
 	}
 	else { //Update didn't happen today
 		if(currentDate.getDay <= 5) { //If current day is Mon - Fri
+			lastUpdateDate.setHours(0,0,0,0);
+			currentDate.setHours(0,0,0,0);
+
+			//Check if last update was on the previous business day - if so only update after 4:30pm today
+			if((currentDate.getDay() == 1 && (currentDate - lastUpdateDate) == 86400000*3) || 
+				(currentDate - lastUpdateDate) == 86400000) {
+				if(currentDate.getHours() < 16 || (currentDate.getHours() == 16 && currentDate.getMinutes() < 30)) {
+					return false;
+				}
+			}
 			return true;
 		}
 		else { //If weekend, check if update happened last Friday
@@ -496,7 +597,8 @@ function isUpdateRequired(shareHistory, currentDate) {
 	}
 }
 
-function fetchShareHistory(index, code, lastDate) {
+//Obsolete
+function fetchShareHistory_AlphaAdvantage(index, code, lastDate) {
 	var stockIndex = index;
 	if(index.toUpperCase() == "ASX") {
 		stockIndex = "AX";
