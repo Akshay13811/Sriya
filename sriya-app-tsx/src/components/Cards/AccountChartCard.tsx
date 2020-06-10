@@ -57,7 +57,7 @@ export class AccountChartCard extends React.Component<IProps, IState> {
 
 	render() {
 		return (
-			<div className="dashboard-card dashboard-chart-card">
+			<div className='dashboard-card dashboard-chart-card'>
 				<div className="dashboard-card-header">{"Cash Total"}</div>
 				<ChartOptions 
 					configuration={this.state.chartConfiguration}

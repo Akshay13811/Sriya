@@ -5,6 +5,7 @@
 	padding: 10px;
 	box-sizing: border-box;
 	height: $dashboard-bar-width;
+	width: $dashboard-bar-width;
 	cursor: pointer;
 }
 
@@ -22,6 +23,23 @@
 	background-color: mix(black, $dashboard-colour, 10);
 }
 
+@media (max-width: 500px) {
+	/* CSS that should be displayed if width is equal to or less than 800px goes here */
+	.dashboard-menu-bar {
+		height: $dashboard-bar-width;
+		width: 100%;
+
+		grid-template-columns: repeat(5, 20%);
+		grid-template-rows: repeat(1, 100%);
+
+		padding-top: 5px;
+	}
+	
+	.dashboard-menu-button {
+		margin-left: auto;
+		margin-right: auto;
+	}
+}
 
 .dashboard-menu-button:hover {
 	background-color: #74B8FF;
@@ -45,4 +63,62 @@
 
 .icon>svg>path{ /*target the image with css*/
 	fill: var(--primary-color);
+}
+
+.notification-bar {
+	width: 300px;
+	height: 100vh;
+	position: fixed;
+	left: $dashboard-bar-width;
+	background-image: linear-gradient(to right, mix(white, $dashboard-colour, 1) , mix(black, $dashboard-colour, 1));
+	border-left: 3px solid $dashboard-colour;
+	z-index: 1;
+}
+
+.notification-bar-list {
+	height: 100%;
+	display: grid;
+	grid-template-columns: 100%;
+	grid-auto-rows: min-content;
+}
+
+.notification-card {
+	background-color: mix(white, $dashboard-colour, 5);
+	display: grid;
+	grid-template-columns: 100%;
+	grid-template-rows: 30px auto;
+
+	margin: 5px 10px 5px 10px;
+	padding: 20px;
+}
+
+.notification-card-title {
+	color: #FFFFFF;
+	font-weight: bold;
+	font-size: 0.9rem;
+}
+
+.notification-card-details {
+	color: #FFFFFF;
+	font-size: 0.8rem;
+}
+
+.slideOut {
+	opacity: 1;
+	transition: 0.2s;
+}
+
+.slideIn {
+	width: 0px;
+	transition: width 0.2s;
+}
+
+.fadeInCard {
+	opacity: 1;
+	transition: 0.2s 0.2s;
+}
+
+.fadeOutCard {
+	opacity: 0;
+	transition: 0.1s;
 }

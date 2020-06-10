@@ -18,6 +18,7 @@ import { IAccount } from '../interfaces/IAccount';
 import { IShare } from '../interfaces/IShare';
 import { IAsset } from '../interfaces/IAsset';
 import { ILoan } from '../interfaces/ILoan';
+import { NotificationInfo, NoticationType } from '../interfaces/INotification';
 
 interface IProps {}
 interface IState {
@@ -26,6 +27,8 @@ interface IState {
 	assets: Array<IAsset>;
 	loans: Array<ILoan>;
 	sharesCombined: Array<IShare>;
+	notifications: Array<NotificationInfo>;
+
 	refreshAccountCard: () => void;
 	refreshShareCard: () => void;
 	refreshLoanCard: () => void;
@@ -43,11 +46,20 @@ export class Dashboard extends React.Component<IProps, IState> {
 			assets: [],
 			loans: [],
 			sharesCombined: [],
+			notifications: [{
+				name: "Daily Share Update", 
+				details: "Imported history for COH",
+				type: NoticationType.INFO
+			},{
+				name: "Unable to import share history", 
+				details: "Unable to import share history for WOW",
+				type: NoticationType.ERROR
+			}],
 			refreshAccountCard: () => {},
 			refreshShareCard: () => {},
 			refreshLoanCard: () => {},
 			refreshAssetCard: () => {},
-			refreshPortfolioCard: () => {}
+			refreshPortfolioCard: () => {},
 		}
 	}
 
@@ -200,6 +212,7 @@ export class Dashboard extends React.Component<IProps, IState> {
 				shares={this.state.shares}
 				assets={this.state.assets}
 				loans={this.state.loans}
+				notifications={this.state.notifications}
 				refreshAccountData={() => this.fetchAccountData()}
 				refreshShareData={() => this.fetchShareData()}
 				refreshAssetData={() => this.fetchAssetData()}
@@ -215,8 +228,8 @@ export class Dashboard extends React.Component<IProps, IState> {
 					{this.renderBar()}
 				</div>
 				<div className="dashboard-main-container">
-					{this.renderPortfolioChartCard()}
-					{this.renderPortfolioBreakdownCard()}
+				{this.renderPortfolioChartCard()}
+					{this.renderPortfolioBreakdownCard()}       
 					{this.renderShareChartCard()}
 					{this.renderAccountCard()}
 					{this.renderLoanChartCard()}

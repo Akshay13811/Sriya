@@ -167,6 +167,7 @@ export class Chart extends React.Component<IProps> {
 					data={data}
 					options={{
 						maintainAspectRatio: false,
+						responsive: true,
 						legend: {
 						display: false
 						},

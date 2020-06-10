@@ -8,22 +8,25 @@ import {ReactComponent as HomeIcon} from '../images/home2.svg';
 import {ReactComponent as WalletIcon} from '../images/wallet2.svg';
 
 //Interfaces
-import {IAccount} from '../interfaces/IAccount';
-import {IShare} from '../interfaces/IShare';
-import {IAsset} from '../interfaces/IAsset';
-import {ILoan} from '../interfaces/ILoan';
+import { IAccount } from '../interfaces/IAccount';
+import { IShare } from '../interfaces/IShare';
+import { IAsset } from '../interfaces/IAsset';
+import { ILoan } from '../interfaces/ILoan';
 
 //Components
-import {BankDialog} from '../Components/Dialogs/BankDialog'
-import {SharesDialog} from './Dialogs/SharesDialog'
-import {AssetsDialog} from './Dialogs/AssetsDialog'
-import {LoansDialog} from './Dialogs/LoansDialog'
+import { BankDialog } from '../Components/Dialogs/BankDialog'
+import { SharesDialog } from './Dialogs/SharesDialog'
+import { AssetsDialog } from './Dialogs/AssetsDialog'
+import { LoansDialog } from './Dialogs/LoansDialog'
+import { NotificationBar } from './NotificationBar'
+import { NotificationInfo } from '../interfaces/INotification';
 
 interface IDashboardBarProps {
 	accounts: Array<IAccount>
 	shares: Array<IShare>
 	assets: Array<IAsset>
 	loans: Array<ILoan>
+	notifications: Array<NotificationInfo>
 	refreshAccountData: () => void;
 	refreshShareData: () => void;
 	refreshAssetData: () => void;
@@ -31,6 +34,7 @@ interface IDashboardBarProps {
 }
 
 interface IDashboardBarState {
+	showNotificationBar: boolean;
 	showBankDialog: boolean;
 	showSharesDialog: boolean;
 	showAssetsDialog: boolean;
@@ -42,11 +46,18 @@ export class DashboardBar extends React.Component<IDashboardBarProps, IDashboard
 	constructor(props: IDashboardBarProps) {
 		super(props);
 		this.state = {
+			showNotificationBar: false,
 			showBankDialog: false,
 			showSharesDialog: false,
 			showAssetsDialog: false,
 			showLoansDialog: false
 		}
+	}
+
+	toggleNotificationBar() {
+		this.setState({
+			showNotificationBar: !this.state.showNotificationBar
+		})
 	}
 
 	openBankDialog() {
@@ -118,7 +129,7 @@ export class DashboardBar extends React.Component<IDashboardBarProps, IDashboard
 		return (
 			<div>
 				<div className="dashboard-menu-bar">
-					<div className="dashboard-menu-button menu-icon">
+					<div className="dashboard-menu-button menu-icon" onClick={() => this.toggleNotificationBar()}>
 						<MenuIcon />
 					</div>
 					<div className="dashboard-menu-button bank-icon" onClick={() => this.openBankDialog()}>
@@ -134,6 +145,11 @@ export class DashboardBar extends React.Component<IDashboardBarProps, IDashboard
 						<BankIcon />
 					</div>
 				</div>
+
+				<NotificationBar
+					showNotifications = {this.state.showNotificationBar}
+					notifications = {this.props.notifications}
+				/>
 
 				<BankDialog 
 					showDialog = {this.state.showBankDialog}

@@ -74,5 +74,10 @@ input[type=date]::-webkit-inner-spin-button {
 	/* CSS that should be displayed if width is equal to or less than 800px goes here */
 	.dashboard-main-container {
 		grid-template-columns: 100%;
+		grid-template-rows: auto;
+		left: 0px;
+		top: $dashboard-bar-width;
+		width: 100%;
+
 	}
 }

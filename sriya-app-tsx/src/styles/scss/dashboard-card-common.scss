@@ -1,5 +1,11 @@
 @import './variables.scss';
 
+@media (max-width: 500px) {
+	.dashboard-card {
+		min-height: 370px;
+	}
+}
+
 .dashboard-card {
 	background-color: mix(white, $dashboard-colour, 5);
 	padding: 20px 20px 10px 20px;
