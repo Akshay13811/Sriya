@@ -14,7 +14,7 @@ import { IAsset } from '../interfaces/IAsset';
 import { ILoan } from '../interfaces/ILoan';
 
 //Components
-import { BankDialog } from '../Components/Dialogs/BankDialog'
+import { BankDialog } from '../components/Dialogs/BankDialog'
 import { SharesDialog } from './Dialogs/SharesDialog'
 import { AssetsDialog } from './Dialogs/AssetsDialog'
 import { LoansDialog } from './Dialogs/LoansDialog'
