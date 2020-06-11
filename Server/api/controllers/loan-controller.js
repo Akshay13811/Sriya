@@ -16,6 +16,7 @@ exports.list_loans = function(req, res) {
 }
 
 exports.create_loan = function(req, res) {
+	console.log("*** Loans - Creating new loan ***");
 	if(!req.files || Object.keys(req.files).length === 0) {
 		console.log('no files uploaded');
 	}
@@ -23,7 +24,7 @@ exports.create_loan = function(req, res) {
 	var currentBalance = 0;
 	var transactions = [];
 	if(req.files && Object.keys(req.files).length > 0) {
-		if(req.body.bankName == "ING") {
+		if(req.body.bankName == "ING" || req.body.bankName.toLowerCase() == "parents") {
 			var info = importINGFile(req.files.importFile);
 			transactions = info.transactions;
 			currentBalance = info.currentBalance;
@@ -61,7 +62,7 @@ exports.update_loan = function(req, res) {
 		var transactions = [];
 		var balance = 0;
 		if(req.files && Object.keys(req.files).length > 0) {
-			if(loan.bankName == "ING") {
+			if(loan.bankName == "ING" || loan.bankName.toLowerCase() == "parents") {
 				var info = importINGFile(req.files.importFile);
 				transactions = info.transactions;
 				balance = info.currentBalance;
@@ -264,6 +265,7 @@ function calculateGraphData(loanData, timePeriod, timeInterval) {
 	for(var i=0; i<loanData.transactions.length; i++) {
 		var transaction = loanData.transactions[i];
 		var transactionDate = new Date(transaction.date);
+		console.log(transactionDate);
 
 		if(transactionDate.getTime() <= lastDate) {
 			break;
@@ -279,9 +281,12 @@ function calculateGraphData(loanData, timePeriod, timeInterval) {
 		currentBalance -= transaction.amount / 100;
 		data[currentDate.getTime()] = currentBalance;
 
-		//Ensure that the last non-zero data point is the loan amount
-		if(currentBalance == 0 && data[currentDate.getTime() + interval] && data[currentDate.getTime() + interval] != loanData.loanAmount && data[currentDate.getTime() + interval] != 0) {
-			data[currentDate.getTime() + interval] = loanData.loanAmount;
+		//Ensure that the last non-zero data point is the loan amount if loan amount is non zero
+		//Loan amounts of zero are loans accurred over time with no initial loan amount
+		if(loanData.loanAmount != 0) {
+			if(currentBalance == 0 && data[currentDate.getTime() + interval] && data[currentDate.getTime() + interval] != loanData.loanAmount && data[currentDate.getTime() + interval] != 0) {
+				data[currentDate.getTime() + interval] = loanData.loanAmount / 100;
+			}
 		}
 	}
 

@@ -560,14 +560,21 @@ function isUpdateRequired(shareHistory, currentDate) {
 		else {
 			//No update required on weekend if already done
 			if(currentDate.getDay() == 6 || currentDate.getDay() == 7) {
-				console.log("No update required on weekend, already up to date")
+				console.log("*** Shares - No update required on weekend, already up to date. Index: " + shareHistory.index + " Code: " + shareHistory.code)
 				return false;
 			}
+			
+			//Do not update if not past 4:30pm today
+			if(currentDate.getHours() < 16 || (currentDate.getHours() == 16 && currentDate.getMinutes() < 30)) {
+				console.log("*** Shares - No update required. Next update after 4:30pm today. Index: " + shareHistory.index + " Code: " + shareHistory.code)
+				return false;
+			}
+
 			return true;
 		}
 	}
 	else { //Update didn't happen today
-		if(currentDate.getDay <= 5) { //If current day is Mon - Fri
+		if(currentDate.getDay() <= 5) { //If current day is Mon - Fri
 			lastUpdateDate.setHours(0,0,0,0);
 			currentDate.setHours(0,0,0,0);
 
@@ -575,22 +582,25 @@ function isUpdateRequired(shareHistory, currentDate) {
 			if((currentDate.getDay() == 1 && (currentDate - lastUpdateDate) == 86400000*3) || 
 				(currentDate - lastUpdateDate) == 86400000) {
 				if(currentDate.getHours() < 16 || (currentDate.getHours() == 16 && currentDate.getMinutes() < 30)) {
+					console.log("*** Shares - No update required, last update was market close of previous business day. Next update will be after market close today. Index: " + shareHistory.index + " Code: " + shareHistory.code)
 					return false;
 				}
 			}
+			console.log("*** Shares - Update required. Index: " + shareHistory.index + " Code: " + shareHistory.code)
 			return true;
 		}
 		else { //If weekend, check if update happened last Friday
 			let daysSinceLastFriday = currentDate.getDay() - 5;
 			let lastFridayDate = new Date(currentDate.getTime() - daysSinceLastFriday * 86400000);
-			lastFridayDate.setHours(17,0,0,0);
+			lastFridayDate.setHours(16,30,0,0);
 
 			if(lastUpdateDate.getTime() > lastFridayDate.getTime())
 			{ //Last update was on the last friday after 5pm
-				console.log("No update required, last update was after the market closed last Friday")
+				console.log("*** Shares - No update required, last update was after the market closed last Friday. Index: " + shareHistory.index + " Code: " + shareHistory.code)
 				return false;
 			}
-			else { //Last update was before friday 5pm
+			else { //Last update was before friday 4:30pm
+				console.log("*** Shares - Update required - Last update before friday 4:30pm. Index: " + shareHistory.index + " Code: " + shareHistory.code)
 				return true;
 			}
 		}

@@ -35,7 +35,7 @@ export class AddAssetConfigCard extends React.Component<IProps, IState> {
 			
 			name: "",
 			description: "",
-			valuation: {value: 0, date: new Date().getTime()}
+			valuation: {value: 0, date: new Date().setHours(0,0,0,0)}
 		}
 	}
 
@@ -68,7 +68,7 @@ export class AddAssetConfigCard extends React.Component<IProps, IState> {
 		}
 
 		let valuation = this.state.valuation;
-		valuation.date = date.getTime();
+		valuation.date = date.setHours(0,0,0,0);
 
 		this.setState({
 			valuation: valuation

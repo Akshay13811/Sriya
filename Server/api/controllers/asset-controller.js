@@ -178,7 +178,6 @@ function processGraphData(period, interval, res) {
 
 	Asset.find({}).then(assets => {
 			graphData = getCombinedGraphData(assets, period, interval);
-			console.log(graphData);
 			if(res) {
 				res.send(graphData);
 			}
