@@ -14,6 +14,10 @@ const RapidApiKey = '7ebe78ee49msh055d582bb72c610p1db410jsnd866d6904ae0';
 const DAYINMS = 86400000;
 
 /* --- Shares --- */
+var updateHistoryInProgress = false;
+var updateHistoryCounter = 0;
+var updateHistorySize = 0;
+var updateHistoryRes = null;
 
 exports.list_shares = function(req, res) {
 	console.log("*** Shares -  Listing Shares ***");
@@ -63,7 +67,7 @@ exports.create_share = function(req, res) {
 		res.json(share);
 	});
 
-	importShareHistory_YahooFin(req.body.index, req.body.code);
+	importShareHistory_YahooFin(req.body.index, req.body.code, res);
 }
 
 exports.delete_share = function(req, res) {
@@ -132,16 +136,21 @@ exports.get_daily_share_data = async function(req, res) {
 
 exports.update_history = function(req, res) {
 	console.log("*** Shares - Updating History *** ")
-	var sharesUpdated = [];
-	Share.find({}, function(err, shares) {
+
+	//Initialise global variables to prevent additional update history calls whilst updating
+	updateHistoryInProgress = true;
+	updateHistoryCounter = 0;
+	updateHistoryRes = {};
+	updateHistoryRes.timestamp = new Date().getTime();
+	updateHistoryRes.updates = [];
+
+	ShareHistory.find({}, function(err, shares) {
+		updateHistorySize = shares.length;
+
 		for(var i=0; i<shares.length; i++) {
-			if(!sharesUpdated.includes(shares[i].index + "." + shares[i].code)) {
-				importShareHistory_YahooFin(shares[i].index, shares[i].code);
-				sharesUpdated.push(shares[i].index + "." + shares[i].code)
-			}
+			setTimeout(importShareHistory_YahooFin, i*500, shares[i].index, shares[i].code, res);
 		}
 	});
-	res.send({status: "Updated History"});
 }
 
 exports.graph_all_data = async function(req, res) {
@@ -368,28 +377,40 @@ function getNextDates(currentDate, lastDate, interval) {
 	}
 }
 
-function importShareHistory_YahooFin(index, code) {
+function importShareHistory_YahooFin(index, code, res) {
 	ShareHistory.findOne({
 		index: index,
 		code: code
 	}, function(err, shareHistory) {
+		var result = false;
 		if(!shareHistory) {
 			var lastDate = new Date();
 			lastDate.setYear(lastDate.getFullYear()-5);
 
 			var history = fetchShareHistory_YahooFin(index, code, lastDate);
 			history.then((data) => {
-				var shareData = {
-					"index": index,
-					"code": code,
-					"history": data,
-					"lastUpdateDate": new Date()
+
+				if(!data) {
+					console.log("*** Shares - No data receieved. Index: " + index + ", Code: " + code + " ***");
+					updateHistoryRes.updates.push({index: index, code: code, updated: false, status: `failed`});
+					result = false;
 				}
-				//Create share history entry
-				var newShareHistory = new ShareHistory(shareData)
-				newShareHistory.save()
-				console.log("*** Shares - Added history for Index: " + index + ", Code: " + code + " ***");
-				return true;
+				else {
+					var shareData = {
+						"index": index,
+						"code": code,
+						"history": data,
+						"lastUpdateDate": new Date()
+					}
+					//Create share history entry
+					var newShareHistory = new ShareHistory(shareData)
+					newShareHistory.save()
+					updateHistoryRes.updates.push({index: index, code: code, updated: true, status: 'ok'});
+					console.log("*** Shares - Added history for Index: " + index + ", Code: " + code + " ***");
+					result = true;
+				}
+
+				incrementHistoryCounter(res);
 			});
 		}
 		else {
@@ -400,19 +421,45 @@ function importShareHistory_YahooFin(index, code) {
 				if(isUpdateRequired(shareHistory, currentDate)) {
 					var history = fetchShareHistory_YahooFin(index, code, new Date(shareHistory.history[0].date));
 					history.then((data) => {
-						shareHistory.history = data.concat(shareHistory.history);
-						shareHistory.lastUpdateDate = currentDate;
-						shareHistory.save();
-						console.log("*** Shares - Completed updating share history for Index: " + index + " Code: " + code + " ***");	
-						return true;
+						if(!data) {
+							console.log("*** Shares - No data receieved. Index: " + index + ", Code: " + code + " ***");
+							updateHistoryRes.updates.push({index: index, code: code, updated: false, status: `failed`});
+							result = false;
+						}
+						else {
+							shareHistory.history = data.concat(shareHistory.history);
+							shareHistory.lastUpdateDate = currentDate;
+							shareHistory.save();
+							console.log("*** Shares - Completed updating share history for Index: " + index + " Code: " + code + " ***");	
+							updateHistoryRes.updates.push({index: index, code: code, updated: true, status: 'ok'});
+							result = true;
+						}
+
+						incrementHistoryCounter(res);
 					})
 				}
 				else {
-					return false;
+					updateHistoryRes.updates.push({index: index, code: code, updated: false, status: 'ok'});
+					incrementHistoryCounter(res);
 				}
 			}
 		}
+		return result;
 	});
+}
+
+function incrementHistoryCounter(res) {
+	if(++updateHistoryCounter == updateHistorySize) {
+		console.log("End - Counter: " + updateHistoryCounter + ", Size: " + updateHistorySize);
+		res.send(updateHistoryRes);
+		updateHistoryInProgress = false;
+		updateHistoryRes = null;
+		updateHistoryCounter = 0;
+		updateHistorySize = 0;
+	}
+	else {
+		console.log("Counter: " + updateHistoryCounter + ", Size: " + updateHistorySize);
+	}
 }
 
 
@@ -439,6 +486,11 @@ function fetchShareHistory_YahooFin(index, code, lastDate) {
 	})
 	.then(res => res.json()) 
 	.then((data) => {
+		if(!data || !data.prices) {
+			console.log(data);
+			return null;
+		}
+
 		var history = [];
 		for(var i=0; i<data.prices.length; i++) {
 			var date = new Date(data.prices[i].date * 1000);
@@ -545,6 +597,7 @@ function importShareHistory_AlphaAdvantage(index, code) {
 }
 
 function isUpdateRequired(shareHistory, currentDate) {
+
 	var lastUpdateDate = new Date(shareHistory.lastUpdateDate);
 
 	//Check if update happened today
@@ -575,12 +628,14 @@ function isUpdateRequired(shareHistory, currentDate) {
 	}
 	else { //Update didn't happen today
 		if(currentDate.getDay() <= 5) { //If current day is Mon - Fri
-			lastUpdateDate.setHours(0,0,0,0);
-			currentDate.setHours(0,0,0,0);
+			var lastUpdateMidnight = new Date(lastUpdateDate.getTime())
+			lastUpdateMidnight.setHours(0,0,0,0);
+			var currentDateMidnight = new Date(currentDate.getTime());
+			currentDateMidnight.setHours(0,0,0,0);
 
 			//Check if last update was on the previous business day - if so only update after 4:30pm today
-			if((currentDate.getDay() == 1 && (currentDate - lastUpdateDate) == 86400000*3) || 
-				(currentDate - lastUpdateDate) == 86400000) {
+			if((currentDateMidnight.getDay() == 1 && (currentDateMidnight - lastUpdateMidnight) == 86400000*3) || 
+				(currentDateMidnight - lastUpdateMidnight) == 86400000) {
 				if(currentDate.getHours() < 16 || (currentDate.getHours() == 16 && currentDate.getMinutes() < 30)) {
 					console.log("*** Shares - No update required, last update was market close of previous business day. Next update will be after market close today. Index: " + shareHistory.index + " Code: " + shareHistory.code)
 					return false;

@@ -131,6 +131,7 @@ export class DashboardBar extends React.Component<IDashboardBarProps, IDashboard
 				<div className="dashboard-menu-bar">
 					<div className="dashboard-menu-button menu-icon" onClick={() => this.toggleNotificationBar()}>
 						<MenuIcon />
+						<span className="badge">{this.props.notifications.length}</span>
 					</div>
 					<div className="dashboard-menu-button bank-icon" onClick={() => this.openBankDialog()}>
 						<WalletIcon />

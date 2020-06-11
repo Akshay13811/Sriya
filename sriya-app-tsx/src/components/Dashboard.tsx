@@ -18,7 +18,7 @@ import { IAccount } from '../interfaces/IAccount';
 import { IShare } from '../interfaces/IShare';
 import { IAsset } from '../interfaces/IAsset';
 import { ILoan } from '../interfaces/ILoan';
-import { NotificationInfo, NoticationType } from '../interfaces/INotification';
+import { NotificationInfo, NoticationType as NotificationType } from '../interfaces/INotification';
 
 interface IProps {}
 interface IState {
@@ -46,15 +46,7 @@ export class Dashboard extends React.Component<IProps, IState> {
 			assets: [],
 			loans: [],
 			sharesCombined: [],
-			notifications: [{
-				name: "Daily Share Update", 
-				details: "Imported history for COH",
-				type: NoticationType.INFO
-			},{
-				name: "Unable to import share history", 
-				details: "Unable to import share history for WOW",
-				type: NoticationType.ERROR
-			}],
+			notifications: [],
 			refreshAccountCard: () => {},
 			refreshShareCard: () => {},
 			refreshLoanCard: () => {},
@@ -75,9 +67,85 @@ export class Dashboard extends React.Component<IProps, IState> {
 		fetch(EndpointUrl+'/shares/updatesharehistory', {mode: 'cors'})
 		.then(res => res.json()) //parses output to json
 		.then((data) => {
-			if(data.status === "Updated History"){
-				//TODO: updated successfully - send notification
+			let notifications = this.state.notifications
+
+			let updatedShares: Array<{index: string, code: string}> = [];
+			let noUpdateShares: Array<{index: string, code: string}> = [];
+			let failedShares: Array<{index: string, code: string}> = [];
+			for (let shareUpdate of data.updates) {
+
+				if(shareUpdate.status === "failed") {
+					console.log(shareUpdate);
+					failedShares.push({index: shareUpdate.index, code: shareUpdate.code})
+				}
+				else if(shareUpdate.updated) {
+					updatedShares.push({index: shareUpdate.index, code: shareUpdate.code})
+				}
+				else {
+					noUpdateShares.push({index: shareUpdate.index, code: shareUpdate.code})
+				}
 			}
+
+			if(updatedShares.length > 0) {
+				let details: string = "Updated history for ";
+				for(let i=0; i<updatedShares.length; i++) {
+					details += updatedShares[i].code;
+					if(i+1 != updatedShares.length) {
+						details += ", ";
+					}
+				}
+				details += ".";
+
+				let notification: NotificationInfo = {
+					name: "Share History",
+					details: details,
+					type: NotificationType.INFO,
+					timestamp: new Date(data.timestamp)
+				}
+				notifications.push(notification);
+			}
+
+			if(noUpdateShares.length > 0) {
+				let details: string = "No update required for ";
+				for(let i=0; i<noUpdateShares.length; i++) {
+					details += noUpdateShares[i].code;
+					if(i+1 != noUpdateShares.length) {
+						details += ", ";
+					}
+				}
+				details += ".";
+
+				let notification: NotificationInfo = {
+					name: "Share History",
+					details: details,
+					type: NotificationType.INFO,
+					timestamp: new Date(data.timestamp)
+				}
+				notifications.push(notification);
+			}
+
+			if(failedShares.length > 0) {
+				let details: string = "History update failed for ";
+				for(let i=0; i<failedShares.length; i++) {
+					details += failedShares[i].code;
+					if(i+1 != failedShares.length) {
+						details += ", ";
+					}
+				}
+				details += ".";
+
+				let notification: NotificationInfo = {
+					name: "Share History",
+					details: details,
+					type: NotificationType.ERROR,
+					timestamp: new Date(data.timestamp)
+				}
+				notifications.push(notification);
+			}
+
+			this.setState({
+				notifications: notifications
+			})
 		})
 		.catch(console.log)
 
@@ -228,7 +296,7 @@ export class Dashboard extends React.Component<IProps, IState> {
 					{this.renderBar()}
 				</div>
 				<div className="dashboard-main-container">
-				{this.renderPortfolioChartCard()}
+					{this.renderPortfolioChartCard()}
 					{this.renderPortfolioBreakdownCard()}       
 					{this.renderShareChartCard()}
 					{this.renderAccountCard()}

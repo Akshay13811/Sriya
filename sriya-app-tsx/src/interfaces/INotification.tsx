@@ -1,7 +1,8 @@
 export type NotificationInfo = {
 	name: string;
 	details: string;
-	type: NoticationType
+	type: NoticationType;
+	timestamp: Date;
 }
 
 export enum NoticationType {

@@ -102,11 +102,11 @@ export class ShareCard extends React.Component<IProps, IState> {
 			}
 		}
 
+		var sharePriceDiff = this.state.currentSharePrice - this.state.lastCloseSharePrice;
 		return (
 			<div className="dashboard-share-card">
 				{this.renderShareIndicator(dailyPercentage)}
 				<div className="center-text">{code}</div>
-				<div className="center-text">Afterpay Limited</div>
 				<div className="right-text">${this.numberWithCommasStr(currentValue.toFixed(2))}</div>
 				<div className="double-row">
 					<div className={overallTextColour}>
@@ -115,6 +115,10 @@ export class ShareCard extends React.Component<IProps, IState> {
 					<div className={overallTextColour}>
 						${this.numberWithCommasStr(overallDifference.toFixed(2))}
 					</div>
+				</div>
+				<div className="double-row">
+					<div className={`right-text`}>${this.numberWithCommasStr(this.state.currentSharePrice.toFixed(2))}</div>
+					<div className={`right-text ${dailyTextColour}`}>${this.numberWithCommasStr(sharePriceDiff.toFixed(2))}</div>
 				</div>
 				<div className="double-row">
 					<div className={dailyTextColour}>

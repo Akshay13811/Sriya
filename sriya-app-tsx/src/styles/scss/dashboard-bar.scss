@@ -9,6 +9,17 @@
 	cursor: pointer;
 }
 
+.dashboard-menu-button .badge {
+	position: relative;
+	bottom: 20px;
+	left: 10px;
+	padding: 2px 7px;
+	border-radius: 10px;
+	background: red;
+	color: white;
+	font-size: 0.8em;
+}
+
 .dashboard-menu-bar {
 	position: fixed;
 	height: 100%;
@@ -32,12 +43,31 @@
 		grid-template-columns: repeat(5, 20%);
 		grid-template-rows: repeat(1, 100%);
 
-		padding-top: 5px;
+		padding-top: $dashboard-bar-padding;
 	}
 	
 	.dashboard-menu-button {
 		margin-left: auto;
 		margin-right: auto;
+	}
+
+	.notification-bar {
+		width: 100% !important;
+		height: 100vh;
+		border-bottom: 3px solid $dashboard-colour;
+		border-left: 0px !important;
+		left: 0px !important;
+		top: $dashboard-bar-width + $dashboard-bar-padding;
+	}
+	.slideOut {
+		opacity: 1;
+		transition: 0.2s;
+	}
+
+	.slideIn {
+		height: 0px !important;
+		transition: height 0.2s !important;
+		width: 100% !important;
 	}
 }
 
@@ -86,10 +116,22 @@
 	background-color: mix(white, $dashboard-colour, 5);
 	display: grid;
 	grid-template-columns: 100%;
-	grid-template-rows: 30px auto;
+	grid-template-rows: 30px auto 20px;
 
 	margin: 5px 10px 5px 10px;
 	padding: 20px;
+}
+
+.info-notification-card {
+	border-left: 5px #35BCEC solid;
+}
+
+.warning-notification-card {
+	border-left: 5px #EDE465 solid;
+}
+
+.error-notification-card {
+	border-left: 5px #F33332 solid;
 }
 
 .notification-card-title {
@@ -101,6 +143,12 @@
 .notification-card-details {
 	color: #FFFFFF;
 	font-size: 0.8rem;
+}
+
+.notification-card-footer {
+	color: #A0A0A0;
+	font-size: 0.8em;
+	text-align: right;
 }
 
 .slideOut {
