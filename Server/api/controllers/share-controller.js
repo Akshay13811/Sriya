@@ -137,10 +137,16 @@ exports.get_daily_share_data = async function(req, res) {
 exports.update_history = function(req, res) {
 	console.log("*** Shares - Updating History *** ")
 
+	if(updateHistoryInProgress) {
+		res.send({status: 1});
+		return;
+	}
+
 	//Initialise global variables to prevent additional update history calls whilst updating
 	updateHistoryInProgress = true;
 	updateHistoryCounter = 0;
 	updateHistoryRes = {};
+	updateHistoryRes.status = 0;
 	updateHistoryRes.timestamp = new Date().getTime();
 	updateHistoryRes.updates = [];
 

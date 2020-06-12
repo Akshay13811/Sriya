@@ -12,6 +12,7 @@ import { DashboardBar } from './DashboardBar';
 
 //Constants
 import { EndpointUrl } from '../Configuration';
+import { UpdateHistoryStatus } from '../Common';
 
 //Interfaces
 import { IAccount } from '../interfaces/IAccount';
@@ -69,78 +70,98 @@ export class Dashboard extends React.Component<IProps, IState> {
 		.then((data) => {
 			let notifications = this.state.notifications
 
-			let updatedShares: Array<{index: string, code: string}> = [];
-			let noUpdateShares: Array<{index: string, code: string}> = [];
-			let failedShares: Array<{index: string, code: string}> = [];
-			for (let shareUpdate of data.updates) {
-
-				if(shareUpdate.status === "failed") {
-					console.log(shareUpdate);
-					failedShares.push({index: shareUpdate.index, code: shareUpdate.code})
-				}
-				else if(shareUpdate.updated) {
-					updatedShares.push({index: shareUpdate.index, code: shareUpdate.code})
-				}
-				else {
-					noUpdateShares.push({index: shareUpdate.index, code: shareUpdate.code})
-				}
-			}
-
-			if(updatedShares.length > 0) {
-				let details: string = "Updated history for ";
-				for(let i=0; i<updatedShares.length; i++) {
-					details += updatedShares[i].code;
-					if(i+1 != updatedShares.length) {
-						details += ", ";
-					}
-				}
-				details += ".";
-
+			if(!data) {
 				let notification: NotificationInfo = {
 					name: "Share History",
-					details: details,
-					type: NotificationType.INFO,
-					timestamp: new Date(data.timestamp)
-				}
-				notifications.push(notification);
-			}
-
-			if(noUpdateShares.length > 0) {
-				let details: string = "No update required for ";
-				for(let i=0; i<noUpdateShares.length; i++) {
-					details += noUpdateShares[i].code;
-					if(i+1 != noUpdateShares.length) {
-						details += ", ";
-					}
-				}
-				details += ".";
-
-				let notification: NotificationInfo = {
-					name: "Share History",
-					details: details,
-					type: NotificationType.INFO,
-					timestamp: new Date(data.timestamp)
-				}
-				notifications.push(notification);
-			}
-
-			if(failedShares.length > 0) {
-				let details: string = "History update failed for ";
-				for(let i=0; i<failedShares.length; i++) {
-					details += failedShares[i].code;
-					if(i+1 != failedShares.length) {
-						details += ", ";
-					}
-				}
-				details += ".";
-
-				let notification: NotificationInfo = {
-					name: "Share History",
-					details: details,
+					details: "Error requesting server to update share history",
 					type: NotificationType.ERROR,
 					timestamp: new Date(data.timestamp)
 				}
 				notifications.push(notification);
+			}
+			else if(data.status == UpdateHistoryStatus.UPDATE_ALREADY_IN_PROGRESS) {
+				let notification: NotificationInfo = {
+					name: "Share History",
+					details: "Update already in progress",
+					type: NotificationType.INFO,
+					timestamp: new Date(data.timestamp)
+				}
+				notifications.push(notification);
+			}
+			else if(data.status == UpdateHistoryStatus.UPDATE_SUCCESSFUL) {
+				let updatedShares: Array<{index: string, code: string}> = [];
+				let noUpdateShares: Array<{index: string, code: string}> = [];
+				let failedShares: Array<{index: string, code: string}> = [];
+				for (let shareUpdate of data.updates) {
+
+					if(shareUpdate.status === "failed") {
+						console.log(shareUpdate);
+						failedShares.push({index: shareUpdate.index, code: shareUpdate.code})
+					}
+					else if(shareUpdate.updated) {
+						updatedShares.push({index: shareUpdate.index, code: shareUpdate.code})
+					}
+					else {
+						noUpdateShares.push({index: shareUpdate.index, code: shareUpdate.code})
+					}
+				}
+
+				if(updatedShares.length > 0) {
+					let details: string = "Updated history for ";
+					for(let i=0; i<updatedShares.length; i++) {
+						details += updatedShares[i].code;
+						if(i+1 != updatedShares.length) {
+							details += ", ";
+						}
+					}
+					details += ".";
+
+					let notification: NotificationInfo = {
+						name: "Share History",
+						details: details,
+						type: NotificationType.INFO,
+						timestamp: new Date(data.timestamp)
+					}
+					notifications.push(notification);
+				}
+
+				if(noUpdateShares.length > 0) {
+					let details: string = "No update required for ";
+					for(let i=0; i<noUpdateShares.length; i++) {
+						details += noUpdateShares[i].code;
+						if(i+1 != noUpdateShares.length) {
+							details += ", ";
+						}
+					}
+					details += ".";
+
+					let notification: NotificationInfo = {
+						name: "Share History",
+						details: details,
+						type: NotificationType.INFO,
+						timestamp: new Date(data.timestamp)
+					}
+					notifications.push(notification);
+				}
+
+				if(failedShares.length > 0) {
+					let details: string = "History update failed for ";
+					for(let i=0; i<failedShares.length; i++) {
+						details += failedShares[i].code;
+						if(i+1 != failedShares.length) {
+							details += ", ";
+						}
+					}
+					details += ".";
+
+					let notification: NotificationInfo = {
+						name: "Share History",
+						details: details,
+						type: NotificationType.ERROR,
+						timestamp: new Date(data.timestamp)
+					}
+					notifications.push(notification);
+				}
 			}
 
 			this.setState({
