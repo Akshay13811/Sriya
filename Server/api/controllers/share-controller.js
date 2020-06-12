@@ -138,7 +138,7 @@ exports.update_history = function(req, res) {
 	console.log("*** Shares - Updating History *** ")
 
 	if(updateHistoryInProgress) {
-		res.send({status: 1});
+		res.send({status: 1, timestamp: new Date().getTime()});
 		return;
 	}
 
