@@ -70,6 +70,10 @@
 		transition: height 0.2s !important;
 		width: 100% !important;
 	}
+
+	.notification-bar.slideIn .simplebar-wrapper {
+		height: 0px;
+	}
 }
 
 .dashboard-menu-button:hover {
@@ -155,11 +159,12 @@
 .slideOut {
 	opacity: 1;
 	transition: 0.2s;
+	z-index: 1;
 }
 
 .slideIn {
 	width: 0px;
-	transition: width 0.2s;
+	transition: width 0.2s z-index 0 0.5s;
 }
 
 .fadeInCard {
