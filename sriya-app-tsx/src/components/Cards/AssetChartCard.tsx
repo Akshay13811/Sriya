@@ -67,6 +67,7 @@ export class AssetChartCard extends React.Component<IProps, IState> {
 					data={this.state.data}
 					configuration={this.state.chartConfiguration}
 					color={'rgba(255,118,116,1)'}
+					units={'$'}
 				/>
 			</div>
 		);

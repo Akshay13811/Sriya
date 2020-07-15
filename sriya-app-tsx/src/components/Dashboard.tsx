@@ -8,11 +8,15 @@ import { AccountChartCard } from './Cards/AccountChartCard';
 import { LoanChartCard } from './Cards/LoanChartCard'
 import { SharePortfolioCard } from './Cards/SharePortfolioCard';
 import { ShareChartCard } from './Cards/ShareChartCard';
+
+import { LoansDetailCard } from './Cards/LoansDetailCard';
+
 import { DashboardBar } from './DashboardBar';
 
 //Constants
 import { EndpointUrl } from '../Configuration';
 import { UpdateHistoryStatus } from '../Common';
+import { ShareChartType } from '../Common';
 
 //Interfaces
 import { IAccount } from '../interfaces/IAccount';
@@ -20,6 +24,12 @@ import { IShare } from '../interfaces/IShare';
 import { IAsset } from '../interfaces/IAsset';
 import { ILoan } from '../interfaces/ILoan';
 import { NotificationInfo, NoticationType as NotificationType } from '../interfaces/INotification';
+
+enum View {
+	Dashboard,
+	LoanDetail,
+	ShareDetail
+}
 
 interface IProps {}
 interface IState {
@@ -29,6 +39,8 @@ interface IState {
 	loans: Array<ILoan>;
 	sharesCombined: Array<IShare>;
 	notifications: Array<NotificationInfo>;
+
+	view: View;
 
 	refreshAccountCard: () => void;
 	refreshShareCard: () => void;
@@ -48,6 +60,7 @@ export class Dashboard extends React.Component<IProps, IState> {
 			loans: [],
 			sharesCombined: [],
 			notifications: [],
+			view: View.Dashboard,
 			refreshAccountCard: () => {},
 			refreshShareCard: () => {},
 			refreshLoanCard: () => {},
@@ -238,34 +251,45 @@ export class Dashboard extends React.Component<IProps, IState> {
 		this.state.refreshPortfolioCard();
 	}
 
-	renderAccountCard() {
+	//Chart cards
+	renderAccountChartCard(className?: string) {
 		return (
 			<AccountChartCard
 				refreshCard={(callable: () => void) => this.setState({refreshAccountCard: callable})}
+				class = {className}
 			/>
 		)
 	}
 
-	renderSharePortfolioCard() {
-		return (
-			<SharePortfolioCard
-				shares = {this.state.sharesCombined}
-			/>
-		)
-	}
-
-	renderShareChartCard() {
+	renderShareChartCard(className?: string) {
 		return (
 			<ShareChartCard
 				refreshCard={(callable: () => void) => this.setState({refreshShareCard: callable})}
+				class = {className}
+				type = {ShareChartType.VALUE}
+				titleClick = {this.showSharesDetailView.bind(this)}
 			/>
 		)
 	}
 
-	renderLoanChartCard() {
+	renderShareROIChartCard(className?: string) {
+		return (
+			<ShareChartCard
+				refreshCard={(callable: () => void) => this.setState({refreshShareCard: callable})}
+				class = {className}
+				type = {ShareChartType.ROI}
+				titleClick = {this.showSharesDetailView.bind(this)}
+			/>
+		)
+	}
+
+
+	renderLoanChartCard(className?: string) {
 		return (
 			<LoanChartCard
 				refreshCard={(callable: () => void) => this.setState({refreshLoanCard: callable})}
+				class = {className}
+				titleClick = {this.showLoansDetailView.bind(this)}
 			/>
 		)
 	}
@@ -278,6 +302,24 @@ export class Dashboard extends React.Component<IProps, IState> {
 		)
 	}
 
+	renderPortfolioChartCard() {
+		return (
+			<PortfolioChartCard
+				refreshCard={(callable: () => void) => this.setState({refreshPortfolioCard: callable})}
+			/>
+		)
+	}
+
+	//Share portfolio card
+	renderSharePortfolioCard() {
+		return (
+			<SharePortfolioCard
+				shares = {this.state.sharesCombined}
+			/>
+		)
+	}
+
+	//Overall portfolio breakdown card
 	renderPortfolioBreakdownCard() {
 		return (
 			<PortfolioBreakdownCard
@@ -286,12 +328,53 @@ export class Dashboard extends React.Component<IProps, IState> {
 		)
 	}
 
-	renderPortfolioChartCard() {
+	//Detail cards
+	renderLoansDetailCard(className?: string) {
 		return (
-			<PortfolioChartCard
-				refreshCard={(callable: () => void) => this.setState({refreshPortfolioCard: callable})}
+			<LoansDetailCard
+				loans = {this.state.loans}
+				class = {className}
 			/>
 		)
+	}
+
+	renderShareDetailCard(className?: string) {
+		return (
+			<div></div>
+		)
+	}
+
+	//Details View
+	renderLoansDetailView() {
+		return (
+			<div className={this.state.view == View.LoanDetail ? 'detail-main-container dashboardFadeIn' : 'detail-main-container dashboardFadeOut'}>
+				{this.renderLoansDetailCard()}
+				{this.renderLoanChartCard("detail-chart")}
+			</div>
+		)
+	}
+
+	renderSharesDetailView(rowHeightPercentage?: string) {
+		return (
+			<div className={this.state.view == View.ShareDetail ? 'detail-main-container dashboardFadeIn' : 'detail-main-container dashboardFadeOut'} style={{gridTemplateRows: `repeat(3, ${rowHeightPercentage}%)`}}>
+				{this.renderShareChartCard("detail-chart")}
+				{this.renderShareROIChartCard("detail-chart")}
+			</div>
+		)
+	}
+
+	showLoansDetailView() {
+		this.setState({
+			view: View.LoanDetail
+		})
+		window.scrollTo(0,0);
+	}
+
+	showSharesDetailView() {
+		this.setState({
+			view: View.ShareDetail
+		})
+		window.scrollTo(0,0);	
 	}
 
 	renderBar() {
@@ -310,19 +393,41 @@ export class Dashboard extends React.Component<IProps, IState> {
 		)
 	}
 
+	renderTogglePageButton() {
+		return (
+			<div className="dashboard-detail-button" onClick={() => this.showDetailPage()}>
+				...
+			</div>
+		)
+	}
+
+	showDetailPage() {
+		let newView: View;
+		if(this.state.view == View.LoanDetail || this.state.view == View.ShareDetail) {
+			this.setState({
+				view: View.Dashboard
+			})		
+		}
+	}
+
 	render() {
 		return(
 			<div className="dashboard">
 				<div>
 					{this.renderBar()}
 				</div>
-				<div className="dashboard-main-container">
+				<div className={this.state.view == View.Dashboard ? 'dashboard-main-container dashboardFadeIn' : 'dashboard-main-container dashboardFadeOut'}>
 					{this.renderPortfolioChartCard()}
 					{this.renderPortfolioBreakdownCard()}       
 					{this.renderShareChartCard()}
-					{this.renderAccountCard()}
+					{this.renderAccountChartCard()}
 					{this.renderLoanChartCard()}
 					{this.renderSharePortfolioCard()}
+				</div>
+				{this.renderLoansDetailView()}
+				{this.renderSharesDetailView("33.33")}
+				<div>
+					{this.renderTogglePageButton()}
 				</div>
 			</div>
 		)

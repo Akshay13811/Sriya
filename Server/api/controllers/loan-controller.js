@@ -44,6 +44,36 @@ exports.create_loan = function(req, res) {
 	})
 }
 
+exports.get_loan_details = function(req, res) {
+	Loan.findOne({
+		_id: req.params.loanId
+	}, function(err, loan) {
+		//Go through transaction history for specified period
+		let period = req.params.period;
+		let lastDate = new Date().getTime() - period*DAYINMS;
+		
+		let payments = 0;
+		let interest = 0;
+		for(let transaction of loan.transactions) {
+			if(transaction.date < lastDate) {
+				break;
+			}
+
+			if(transaction.description.startsWith("Interest Charge")) {
+				interest += transaction.amount;
+			}
+			else {
+				payments -= transaction.amount;
+			}
+		}
+
+		res.json({
+			payments: payments,
+			interest: interest
+		})
+	});
+}
+
 exports.delete_loan = function(req, res) {
 	Loan.remove({
 		_id: req.params.loanId
@@ -70,6 +100,7 @@ exports.update_loan = function(req, res) {
 		}
 
 		loan.loanAmount = req.body.loanAmount;
+		loan.interestRate = req.body.interestRate;
 
 		//Update loan with new transactions
 		if(loan.transactions.length == 0) {

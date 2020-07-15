@@ -13,11 +13,11 @@ interface IProps {
 	shares: Array<IShare>;
 }
 
-interface IState {
+export class SharePortfolioCard extends React.Component<IProps> {
 
-}
-
-export class SharePortfolioCard extends React.Component<IProps, IState> {
+	constructor(props: IProps) {
+		super(props);
+	}
 
 	render() {
 		return (

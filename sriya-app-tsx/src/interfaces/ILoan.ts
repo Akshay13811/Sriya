@@ -3,6 +3,7 @@ export interface ILoan {
 	accountName: string;
 	bankName: string;
 	loanAmount: number;
+	interestRate: string;
 	currentBalance: number;
 	transactions: Array<ITransaction>;
 } 
@@ -12,4 +13,9 @@ export interface ITransaction {
 	date: string;
 	description: string;
 	amount: number
+}
+
+export interface ILoanDetails {
+	payments: number,
+	interest: number
 }

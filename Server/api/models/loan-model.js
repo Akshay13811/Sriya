@@ -22,6 +22,10 @@ var LoanSchema = new Schema({
 		type: Number,
 		required: 'Please enter the loan amount'
 	},
+	interestRate: {
+		type: Number,
+		require: 'Please enter the interest rate'
+	},
 	currentBalance: {
 		type: Number,
 	},

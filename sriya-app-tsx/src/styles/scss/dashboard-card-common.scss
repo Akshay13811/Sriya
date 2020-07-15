@@ -1,12 +1,14 @@
 @import './variables.scss';
 
 @media (max-width: 500px) {
-	.dashboard-card {
+	.dashboard-card,
+	.detail-card {
 		min-height: 370px;
 	}
 }
 
-.dashboard-card {
+.dashboard-card,
+.detail-card {
 	background-color: mix(white, $dashboard-colour, 5);
 	padding: 20px 20px 10px 20px;
 	margin: 5px;
@@ -17,13 +19,18 @@
 	align-items: stretch;	
 }
 
-.dashboard-card-header {
+.dashboard-card-header,
+.detail-card-header {
 	color: white;
 	font-weight: 600;
 	font-size: 18px;
 	height: $dashboard-card-header-height;
 
 	flex: 0 1 auto;
+}
+
+.dashboard-card-header:hover {
+	cursor: pointer;
 }
 
 //-----------------------------------------------------------------

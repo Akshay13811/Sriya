@@ -12,6 +12,8 @@ $FontPathOpenSans: "../../../node_modules/npm-font-open-sans/fonts";
 @import './dashboard-dialog-bank.scss';
 @import './dashboard-dialog-loan.scss';
 
+@import './detail-card-common.scss';
+
 //3rd party scss
 @import '../../../node_modules/simplebar/dist/simplebar.min.css';
 
@@ -44,7 +46,7 @@ input[type=date]::-webkit-inner-spin-button {
 }
 
 .fadeOut{
-	opacity:0;
+	opacity: 0;
 	z-index: -1;
 	height: 0px !important;
 	padding: 0px !important;
@@ -52,22 +54,64 @@ input[type=date]::-webkit-inner-spin-button {
 }
 
 .fadeIn{
-	opacity:1;
+	opacity: 1;
 	transition: opacity 0.3s 0.3s, height 0.3s 0.3s;
 	z-index: 1;
+}
+
+.dashboardFadeIn {
+	opacity: 1;
+	transition: opacity 0.3s 0.3s;
+	z-index: 0;
+}
+
+.dashboardFadeOut {
+	opacity: 0;
+	z-index: -1;
+	height: 0px !important;
+	padding: 0px !important;
+	transition: opacity 0.3s, z-index 0s 0.3s, height 0s 0.3s, padding 0s 0.3s;
+}
+
+.dashboard-main-container,
+.detail-main-container {
+	position: absolute;
+	height: 100vh;
+	left: $dashboard-bar-width;
+	width: calc(100% - #{$dashboard-bar-width});
+	padding: 5px;
+	box-sizing: border-box;
 }
 
 .dashboard-main-container {
 	display: grid;
 	grid-template-rows: repeat(2, 45%);
 	grid-template-columns: repeat(3, 33.33%);
+}
 
-	position: relative;
-	height: 100vh;
-	left: $dashboard-bar-width;
-	width: calc(100% - #{$dashboard-bar-width});
-	padding: 5px;
-	box-sizing: border-box;
+.detail-main-container {
+	display: grid;
+	grid-template-rows: repeat(3, 75%);
+	grid-template-columns: repeat(3, 33.33%);
+}
+
+.dashboard-detail-button {
+	position: fixed;
+	right: 30px;
+	bottom: 20px;
+	border-radius: 30px;
+	background-color: white;
+	opacity: 0.5;
+	text-align: center;
+	font-size: 25px;
+	padding: 0px 15px 15px 15px;
+	border: 5px solid $dashboard-colour;
+	z-index: 1;
+}
+
+.dashboard-detail-button:hover {
+	cursor: pointer;
+	opacity: 0.8;
 }
 
 @media (max-width: 500px) {
@@ -78,6 +122,13 @@ input[type=date]::-webkit-inner-spin-button {
 		left: 0px;
 		top: $dashboard-bar-width;
 		width: 100%;
+	}
 
+	.detail-main-container {
+		grid-template-columns: 100%;
+		grid-template-rows: auto;
+		left: 0px;
+		top: $dashboard-bar-width;
+		width: 100%;
 	}
 }

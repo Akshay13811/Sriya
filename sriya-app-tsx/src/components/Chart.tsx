@@ -1,10 +1,11 @@
 import React from 'react';
 
 //Interfaces
-import {IGraphData} from '../interfaces/IGraphData';
+import { IGraphData } from '../interfaces/IGraphData';
+import { IGraphMilestoneData } from '../interfaces/IGraphMiletoneData';
 
 //3rd party chart library
-import {Line} from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 
 export const ChartConfigurations = [
 	{
@@ -53,8 +54,10 @@ export const ChartConfigurations = [
 
 interface IProps {
 	data: IGraphData;
+	milestones?: IGraphMilestoneData;
 	configuration: number;
 	color: string;
+	units: string;
 }
 
 export class Chart extends React.Component<IProps> {
@@ -151,14 +154,41 @@ export class Chart extends React.Component<IProps> {
 	render() {
 		var stepSize = this.getStepSize(4);
 		var labels = this.getLabels();
-		var data = {
-			labels: labels.reverse(),
-			datasets: [{
-				fill: false,
-				backgroundColor: [this.props.color],
-				borderColor: [this.props.color],
-				data: Object.values(this.props.data).reverse()
-			}]
+
+		var data = {};
+		if(!this.props.milestones) {
+			data = {
+				labels: labels.reverse(),
+				datasets: [{
+					fill: false,
+					backgroundColor: [this.props.color],
+					borderColor: [this.props.color],
+					data: Object.values(this.props.data).reverse()
+				}]
+			}
+		}
+		else {
+			data = {
+				labels: labels.reverse(),
+				datasets: [{
+					label: "milestones",
+					fill: false,
+					backgroundColor: "#FF6384",
+					borderColor: "#FF6384",
+					data: Object.values(this.props.milestones.data).reverse(),
+					pointRadius: 5,
+					pointHoverRadius: 10,
+					showLine: false,
+					milestoneLabels: this.props.milestones.labels.reverse()
+				},{
+					label: "data",
+					fill: false,
+					backgroundColor: [this.props.color],
+					borderColor: [this.props.color],
+					data: Object.values(this.props.data).reverse(),
+					type: 'line'
+				}]
+			}
 		}
 
 		return (
@@ -190,12 +220,47 @@ export class Chart extends React.Component<IProps> {
 								ticks: {
 									fontColor: 'rgba(255,255,255,1)',
 									stepSize: [stepSize],
-									callback: function(value:number) {
-										return '$' + value;
+									callback: (value:number) => {
+										if(this.props.units === '$') {
+											return '$' + value;
+										} else if(this.props.units === '%') {
+											return value + '%';
+										} else {
+											return value;
+										}
 									}
 								}
 							}]
-						}
+						},
+						tooltips: {
+							callbacks: {
+								label: (t: any, d: any) => {
+									let milestoneLabel = "";
+									if(d.datasets[t.datasetIndex].milestoneLabels) {
+										if(t.index < d.datasets[t.datasetIndex].milestoneLabels.length) {
+											milestoneLabel = d.datasets[t.datasetIndex].milestoneLabels[t.index];
+										}
+									}
+
+									if(milestoneLabel) {
+										return milestoneLabel;
+									}
+									else {
+										let yLabel: string;
+										if(this.props.units === '$') {
+											yLabel = t.yLabel >= 1000 ? '$' + t.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '$' + t.yLabel;
+										}
+										else if(this.props.units === '%') {
+											yLabel = t.yLabel.toFixed(2) + '%';
+										}
+										else {
+											yLabel = t.yLabel;
+										}
+										return yLabel;
+									}
+								}
+							}
+						},
 					}}
 				/>
 			</div>

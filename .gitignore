@@ -20,6 +20,9 @@
 .env.test.local
 .env.production.local
 
+#generated
+/sriya-app-tsx/src/styles/css/*.css
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

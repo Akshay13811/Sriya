@@ -209,9 +209,9 @@ function processGraphData(period, interval, res) {
 	}
 
 	Share.find({}).then(async (shares) => {
-			graphData = await getCombinedGraphData(shares, period, interval);
+			graphData = await combineGraphData(shares, period, interval);
 			if(res) {
-				res.send(graphData);
+				res.send({graphData: graphData.data, roiGraphData: graphData.roiData, soldData: graphData.soldData, purchaseData: graphData.purchaseData});
 			}
 		}
 		, err => {
@@ -223,20 +223,61 @@ function processGraphData(period, interval, res) {
 }
 
 async function getCombinedGraphData(shares, period, interval) {
+	var graphData = await combineGraphData(shares, period, interval);
+	return graphData.data;
+}
+
+async function combineGraphData(shares, period, interval) {
 
 	var promise = () => (
 		new Promise(async (resolve, reject) => {
 			var sharesData = [];
+			var sharesSoldData = [];
+			var sharesPurchaseDate = [];
 			for(var i=0; i<shares.length; i++) {
-				sharesData.push(await calculateGraphData(shares[i], period, interval));
+				var graphData = await calculateGraphData(shares[i], period, interval);
+				sharesData.push({share: shares[i], graphData: graphData.data});
+				if(graphData.sold) {
+					sharesSoldData.push(graphData.sold)
+				}
+				if(graphData.purchase) {
+					sharesPurchaseDate.push(graphData.purchase)
+				}
 			}
 
-			var graphData = combineAllData(sharesData, period, interval);
-			resolve(graphData);
+			var combinedData = combineAllData(sharesData, period, interval);
+			var graphSoldData = combineShareData(sharesSoldData);
+			var graphPurchaseData = combineShareData(sharesPurchaseDate);
+			resolve({data: combinedData.valueData, roiData: combinedData.roiData, soldData: graphSoldData, purchaseData: graphPurchaseData});
 		})
 	)
 	var graphData = await (promise());
 	return graphData;
+}
+
+function combineShareData(data) {
+	var soldMap = {}; 
+	for(var i=0; i<data.length; i++) {
+		if(soldMap[data[i].date]) {
+			var foundExisting = false;
+			for(var j=0; j<soldMap[data[i].date].length; j++) {
+				if(soldMap[data[i].date][j].index == data[i].index && soldMap[data[i].date][j].code == data[i].code) {
+					soldMap[data[i].date][j].units += data[i].units;
+					soldMap[data[i].date][j].value += data[i].value; 
+					foundExisting = true;
+					break;
+				}
+			}
+
+			if(!foundExisting) {
+				soldMap[data[i].date].push({index: data[i].index, code: data[i].code, units: data[i].units, value: data[i].value});
+			}
+		}
+		else {
+			soldMap[data[i].date] = [{index: data[i].index, code: data[i].code, units: data[i].units, value: data[i].value}];
+		}
+	}
+	return soldMap;
 }
 
 function combineAllData(data, timePeriod, timeInterval) {
@@ -244,35 +285,44 @@ function combineAllData(data, timePeriod, timeInterval) {
 		return {};
 	}
 	else if(data.length == 1) {
-		return data[0];
+		return data[0].graphData;
 	}
 
 	var interval = DAYINMS*timeInterval;
 
-	var combinedData = {};
+	var combinedValueData = {};
+	var combinedROIData = {};
 	var currentDate = new Date();
 	currentDate.setHours(0, 0, 0, 0);
 	var lastDate = currentDate.getTime() - DAYINMS*timePeriod;
 
 	while(currentDate >= lastDate) {
-		combinedData[currentDate.getTime()] = Math.round(data[0][currentDate.getTime()])
-		for(var i=1; i<data.length; i++) {
-			if(data[i][currentDate.getTime()]) {
-				if(!combinedData[currentDate.getTime()]) {
-					combinedData[currentDate.getTime()] = Math.round(data[i][currentDate.getTime()])
+		var totalPurchaseValue = 0;
+
+		for(var i=0; i<data.length; i++) {
+			if(data[i].graphData[currentDate.getTime()]) {
+				if(!combinedValueData[currentDate.getTime()]) {
+					combinedValueData[currentDate.getTime()] = Math.round(data[i].graphData[currentDate.getTime()])
 				}
 				else {
-					combinedData[currentDate.getTime()] += Math.round(data[i][currentDate.getTime()])
+					combinedValueData[currentDate.getTime()] += Math.round(data[i].graphData[currentDate.getTime()])
+				}
+			}
+			if(currentDate.getTime() >= data[i].share.purchaseDate) {
+				if(!data[i].share.soldDate || currentDate.getTime() < data[i].share.soldDate) {
+					totalPurchaseValue += data[i].share.numberOfShares*data[i].share.purchasePrice;
 				}
 			}
 		}
+
+		combinedROIData[currentDate.getTime()] = (combinedValueData[currentDate.getTime()] - totalPurchaseValue) / totalPurchaseValue * 100;
 
 		var updatedDates = getNextDates(currentDate, lastDate, interval);
 		currentDate = updatedDates.currentDate;
 		lastDate = updatedDates.lastDate;	
 	}
 
-	return combinedData;
+	return {valueData: combinedValueData, roiData: combinedROIData};
 }
 
 async function calculateGraphData(share, timePeriod, timeInterval) {
@@ -286,9 +336,14 @@ async function calculateGraphData(share, timePeriod, timeInterval) {
 	var lastDate = currentDate.getTime() - DAYINMS*timePeriod;
 
 	var data = {};
+	var soldDate;
+	var purchaseDate;
 	while(currentDate.getTime() >= lastDate) {
 		//Check if share holding was held at this date
 		if(currentDate.getTime() < share.purchaseDate) {
+			if(!purchaseDate) {
+				purchaseDate = currentDate.getTime();
+			}
 			data[currentDate.getTime()] = 0;
 			var updatedDates = getNextDates(currentDate, lastDate, interval);
 			currentDate = updatedDates.currentDate;
@@ -303,6 +358,10 @@ async function calculateGraphData(share, timePeriod, timeInterval) {
 			currentDate = updatedDates.currentDate;
 			lastDate = updatedDates.lastDate;
 			continue;
+		}
+
+		if(share.soldDate && !soldDate) {
+			soldDate = currentDate.getTime();
 		}
 		
 		const shareHistory = await ShareHistory.aggregate([
@@ -352,7 +411,31 @@ async function calculateGraphData(share, timePeriod, timeInterval) {
 		lastDate = updatedDates.lastDate;
 	}
 
-	return data;
+	var result = {}
+	result.data = data;
+	result.sold = null;
+	result.purchase = null;
+	if(soldDate) {
+		result.sold = {	
+			date: soldDate, 
+			index: share.index, 
+			code: share.code, 
+			units: share.numberOfShares, 
+			value: data[soldDate]
+		};
+	}
+
+	if(purchaseDate) {
+		result.purchase = {	
+			date: purchaseDate, 
+			index: share.index, 
+			code: share.code, 
+			units: share.numberOfShares, 
+			value: share.numberOfShares*share.purchasePrice
+		};
+	}
+
+	return result;
 }
 
 function getNextDate(date, interval) {

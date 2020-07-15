@@ -7,6 +7,9 @@ module.exports = function(app) {
 		.get(loans.list_loans)
 		.post(loans.create_loan);
 
+	app.route('/loans/details/:loanId/:period')
+		.get(loans.get_loan_details)
+
 	app.route('/loans/:loanId')
 		.delete(loans.delete_loan)
 		.post(loans.update_loan);

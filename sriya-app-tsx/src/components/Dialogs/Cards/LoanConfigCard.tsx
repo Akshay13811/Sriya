@@ -27,6 +27,7 @@ interface IState {
 	bankName: string;
 	accountFile: any;
 	loanAmount: number;
+	interestRate: string;
 }
 
 export class LoanConfigCard extends React.Component<IProps, IState> {
@@ -39,7 +40,8 @@ export class LoanConfigCard extends React.Component<IProps, IState> {
 			accountName: this.props.loan.accountName,
 			bankName: this.props.loan.bankName,
 			accountFile: null,
-			loanAmount: this.props.loan.loanAmount
+			loanAmount: this.props.loan.loanAmount,
+			interestRate: this.props.loan.interestRate
 		}
 	}
 
@@ -72,6 +74,12 @@ export class LoanConfigCard extends React.Component<IProps, IState> {
 
 		this.setState({
 			loanAmount: loanAmount
+		})
+	}
+
+	handleInterestRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		this.setState({
+			interestRate: e.currentTarget.value.replace(/(\%|,)/g, '')
 		})
 	}
 
@@ -138,6 +146,7 @@ export class LoanConfigCard extends React.Component<IProps, IState> {
 		formData.append("accountName", this.state.accountName);
 		formData.append("bankName", this.state.bankName);
 		formData.append("loanAmount", this.state.loanAmount.toString());
+		formData.append("interestRate", this.state.interestRate);
 		formData.append("importFile", this.state.accountFile);
 
 		fetch(EndpointUrl + '/loans/' + this.props.loan._id, {
@@ -166,6 +175,7 @@ export class LoanConfigCard extends React.Component<IProps, IState> {
 				<input className="dashboard-loan-config-card-item" disabled={!this.state.editMode} value={this.state.accountName} onInput={this.handleAccountNameChange}></input>
 				<input className="dashboard-loan-config-card-item" disabled={!this.state.editMode} value={this.state.bankName} onInput={this.handleBankNameChange}></input>
 				<input className="dashboard-loan-config-card-item" disabled={!this.state.editMode} value={'$' + this.numberWithCommas(this.state.loanAmount / 100)} onInput={this.handleLoanAmountChange}></input>
+				<input className="dashboard-loan-config-card-item" disabled={!this.state.editMode} value={this.state.interestRate + '%'} onInput={this.handleInterestRateChange}></input>
 
 				{(!this.state.editMode) &&
 					<div className="dashboard-share-config-card-edit-icon" onClick={this.modifyMode}>

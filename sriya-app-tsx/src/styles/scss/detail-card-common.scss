@@ -1,0 +1,62 @@
+@import './variables.scss';
+
+.detail-loan-card {
+	display: grid;
+}
+
+.detail-loan-card-title {
+	color: white;
+	padding-top: 5px;
+}
+
+.detail-card-container {
+	height: calc(100% - 40px);
+}
+
+.detail-loan-card-details {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.detail-chart {
+	grid-column: 2/4;
+}
+
+.detail-col2-container {
+	grid-column: 1/4;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+}
+
+.detail-small-title,
+.detail-large-title {
+	color: #F0F0F0;
+	font-size: 0.8em;
+}
+
+.detail-small-text,
+.detail-large-text {
+	color: #C0C0C0;
+	font-size: 0.8em;
+}
+
+.detail-large-title {
+	grid-column: 1/4;
+}
+
+.detail-large-text {
+	grid-column: 1/4;
+}
+
+.detail-divider {
+	border-top: 1px solid #808080;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+@media (max-width: 500px) {
+	/* CSS that should be displayed if width is equal to or less than 800px goes here */
+	.detail-chart {
+		grid-column: 1;
+	}
+}

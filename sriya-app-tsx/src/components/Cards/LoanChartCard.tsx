@@ -12,6 +12,8 @@ import {EndpointUrl} from '../../Configuration';
 
 interface IProps {
 	refreshCard: (refresh: () => void) => void;
+	class?: string;
+	titleClick : () => void;
 }
 
 interface IState {
@@ -35,14 +37,11 @@ export class LoanChartCard extends React.Component<IProps, IState> {
 	 }
 	
 	fetchLoanGraphData() {
-		console.log("Fetching loan data");
 		var period = ChartConfigurations[this.state.chartConfiguration].period;
 		var interval = ChartConfigurations[this.state.chartConfiguration].interval;
 		fetch(EndpointUrl+'/loans/graph/'+period+'/'+interval, {mode: 'cors'})
 		.then(res => res.json()) //parses output to json
 		.then((data) => {
-			console.log("Got data");
-			console.log(data);
 			this.setState({
 				data: data
 			})
@@ -60,8 +59,8 @@ export class LoanChartCard extends React.Component<IProps, IState> {
 
 	render() {
 		return (
-			<div className="dashboard-card dashboard-chart-card">
-				<div className="dashboard-card-header">{"Loans"}</div>
+			<div className={`dashboard-card dashboard-chart-card ${this.props.class}`}>
+				<div className="dashboard-card-header" onClick={() => {this.props.titleClick()}}>{"Loans"}</div>
 				<ChartOptions 
 					configuration={this.state.chartConfiguration}
 					changeConfiguration={(i) => this.changeConfiguration(i)}
@@ -70,6 +69,7 @@ export class LoanChartCard extends React.Component<IProps, IState> {
 					data={this.state.data}
 					configuration={this.state.chartConfiguration}
 					color={'rgba(255,118,116,1)'}
+					units={'$'}
 				/>
 			</div>
 		);

@@ -44,6 +44,9 @@ export class LoanSummaryDialog extends React.Component<IProps> {
 									Amount
 								</div>
 								<div className="dashboard-summary-table-header-column">
+									Interest Rate
+								</div>
+								<div className="dashboard-summary-table-header-column">
 								</div>
 								<div className="dashboard-summary-table-header-column">
 								</div>
