@@ -137,7 +137,7 @@ export class ShareConfigCard extends React.Component<IProps, IState> {
 			alert("Available units is invalid");
 			return;
 		}
-		else if(isNaN(this.state.price) || this.state.price === 0) {
+		else if(isNaN(this.state.price)) {
 			alert("Purchase price is invalid")
 			return;
 		}

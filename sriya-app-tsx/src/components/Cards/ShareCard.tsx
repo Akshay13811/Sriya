@@ -76,7 +76,9 @@ export class ShareCard extends React.Component<IProps, IState> {
 			var purchaseValue = this.props.share.purchasePrice * this.props.share.numberOfShares
 			currentValue = this.state.currentSharePrice * this.props.share.numberOfShares;	
 			overallDifference = currentValue - purchaseValue;
-			overallPercentage = overallDifference / purchaseValue * 100;
+			if(purchaseValue !== 0) {
+				overallPercentage = overallDifference / purchaseValue * 100;
+			}
 		
 			if(overallDifference > 0) {
 				overallTextColour = "right-text green-text";

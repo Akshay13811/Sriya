@@ -128,10 +128,19 @@ exports.get_daily_share_data = async function(req, res) {
 		return;
 	}
 
-	res.send({
-		currentSharePrice: shareHistory[0].current.close,
-		lastCloseSharePrice: shareHistory[0].last.close
-	})
+	//If no last then send last as current. Possibility that current date is when share started trading and hence no last.
+	if(!shareHistory[0].last) {
+		res.send({
+			currentSharePrice: shareHistory[0].current.close,
+			lastCloseSharePrice: shareHistory[0].current.close
+		})
+	}
+	else {
+		res.send({
+			currentSharePrice: shareHistory[0].current.close,
+			lastCloseSharePrice: shareHistory[0].last.close
+		})
+	}
 }
 
 exports.update_history = function(req, res) {
@@ -337,13 +346,11 @@ async function calculateGraphData(share, timePeriod, timeInterval) {
 
 	var data = {};
 	var soldDate;
-	var purchaseDate;
+	var purchaseDate = new Date(share.purchaseDate);
+	purchaseDate.setHours(0,0,0,0);
 	while(currentDate.getTime() >= lastDate) {
 		//Check if share holding was held at this date
-		if(currentDate.getTime() < share.purchaseDate) {
-			if(!purchaseDate) {
-				purchaseDate = currentDate.getTime();
-			}
+		if(currentDate.getTime() < purchaseDate) {
 			data[currentDate.getTime()] = 0;
 			var updatedDates = getNextDates(currentDate, lastDate, interval);
 			currentDate = updatedDates.currentDate;
@@ -427,14 +434,14 @@ async function calculateGraphData(share, timePeriod, timeInterval) {
 
 	if(purchaseDate) {
 		result.purchase = {	
-			date: purchaseDate, 
+			date: purchaseDate.getTime(), 
 			index: share.index, 
 			code: share.code, 
 			units: share.numberOfShares, 
 			value: share.numberOfShares*share.purchasePrice
 		};
 	}
-
+	
 	return result;
 }
 
