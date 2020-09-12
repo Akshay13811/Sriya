@@ -17,6 +17,6 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.1.6",
     "mongoose": "^5.9.6",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.1"
   }
 }
